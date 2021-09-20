@@ -5,8 +5,12 @@
   "author": "Ory GmbH",
   "prettier": "ory-prettier-styles",
   "license": "Apache-2.0",
+  "config": {
+    "prettierTarget": "**/*.{tsx,ts,json,md,js,css}"
+  },
   "scripts": {
-    "format": "prettier -w '**/*.{tsx,ts,json,md,js,css}'",
+    "format": "prettier --write ${npm_package_config_prettierTarget}",
+    "format:check": "prettier --check ${npm_package_config_prettierTarget}",
     "build": "rm -rf dist && rollup -c",
     "prepublishOnly": "npm run build",
     "test": "jest"
