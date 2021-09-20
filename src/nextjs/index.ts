@@ -39,6 +39,11 @@ export interface CreateApiHandlerOptions {
    * not on Vercel.
    */
   forceCookieSecure?: boolean
+
+  /**
+   * If set to true will fallback to the playground if no other value is set for the Ory SDK URL.
+   */
+  fallbackToPlayground?: boolean
 }
 
 /**
@@ -47,7 +52,9 @@ export interface CreateApiHandlerOptions {
  * For this handler to work, please set the environment variable `ORY_SDK_URL`.
  */
 export function createApiHandler(options: CreateApiHandlerOptions) {
-  let baseUrl = ''
+  let baseUrl = options.fallbackToPlayground
+    ? 'https://playground.projects.oryapis.com/'
+    : ''
   if (process.env.ORY_SDK_URL) {
     baseUrl = process.env.ORY_SDK_URL
   }

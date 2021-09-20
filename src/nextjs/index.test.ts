@@ -84,4 +84,18 @@ describe('NextJS handler', () => {
       expect(secure).toBeTruthy()
     })
   })
+
+  test('returns the alive status code', async () => {
+    app = createApp({
+      forceCookieSecure: false,
+      fallbackToPlayground: true
+    })
+
+    const response = await request(app.app).get(
+      '/?paths=api&paths=kratos&paths=public&paths=health&paths=alive'
+    )
+
+    expect(response.statusCode).toBe(200)
+    expect(response.body.status).toBe('ok')
+  })
 })
