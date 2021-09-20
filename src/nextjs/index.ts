@@ -3,7 +3,9 @@ import { NextApiRequest, NextApiResponse } from 'next'
 import { CookieSerializeOptions, serialize } from 'cookie'
 import parse from 'set-cookie-parser'
 
-// The vercel API configuration
+/**
+ * The NextJS API configuration
+ */
 export const config = {
   api: {
     bodyParser: false
