@@ -12,12 +12,7 @@ export const config = {
 
 const encode = (v: string) => v
 
-/**
- * Creates a NextJS / Vercel API Handler
- *
- * For this handler to work, please set the environment variable `ORY_SDK_URL`.
- */
-export function createApiHandler(options: {
+export interface CreateApiHandlerOptions {
   /**
    * If set overrides the API Base URL. Usually, this URL
    * is taken from the ORY_SDK_URL environment variable.
@@ -42,7 +37,14 @@ export function createApiHandler(options: {
    * not on Vercel.
    */
   forceCookieSecure?: boolean
-}) {
+}
+
+/**
+ * Creates a NextJS / Vercel API Handler
+ *
+ * For this handler to work, please set the environment variable `ORY_SDK_URL`.
+ */
+export function createApiHandler(options: CreateApiHandlerOptions) {
   let baseUrl = ''
   if (process.env.ORY_SDK_URL) {
     baseUrl = process.env.ORY_SDK_URL
@@ -62,16 +64,18 @@ export function createApiHandler(options: {
     })
 
     const path = Array.isArray(paths) ? paths.join('/') : paths
+    const url = `${baseUrl}/${path}?${search.toString()}`
     req
-      .pipe(request(`${baseUrl}/${path}?${search.toString()}`))
+      .pipe(request(url))
       .on('response', (res) => {
         res.headers['set-cookie'] = parse(res)
           .map((cookie) => ({
             ...cookie,
             domain: options.forceCookieDomain,
             secure:
-              process.env.VERCEL_ENV !== 'development' ||
-              options.forceCookieSecure,
+              options.forceCookieSecure === undefined
+                ? process.env.VERCEL_ENV !== 'development'
+                : options.forceCookieSecure,
             encode
           }))
           .map(({ value, name, ...options }) =>
