@@ -3,8 +3,15 @@ import express from 'express'
 import { NextApiRequest, NextApiResponse } from 'next'
 import request from 'supertest'
 import parse from 'set-cookie-parser'
+import http from 'http'
+import { Application } from 'express-serve-static-core'
 
-function createApp(options: CreateApiHandlerOptions) {
+interface AppResult {
+  app: Application
+  server: http.Server
+}
+
+function createApp(options: CreateApiHandlerOptions): AppResult {
   const app = express()
 
   const handler = createApiHandler(options)
@@ -14,19 +21,27 @@ function createApp(options: CreateApiHandlerOptions) {
   })
 
   app.use(router)
-  app.listen()
 
-  return app
+  return {
+    app,
+    server: app.listen()
+  }
 }
 
 describe('NextJS handler', () => {
+  let app: AppResult
+
+  afterEach(() => {
+    app?.server.close()
+  })
+
   test('returns the alive status code', async () => {
-    const app = createApp({
+    app = createApp({
       apiBaseUrlOverride: 'https://playground.projects.oryapis.com',
       forceCookieSecure: false
     })
 
-    const response = await request(app).get(
+    const response = await request(app.app).get(
       '/?paths=api&paths=kratos&paths=public&paths=health&paths=alive'
     )
 
@@ -44,14 +59,15 @@ describe('NextJS handler', () => {
       expect(secure).toBeFalsy()
     })
   })
+
   test('uses the options correctly', async () => {
-    const app = createApp({
+    app = createApp({
       apiBaseUrlOverride: 'https://i-do-not-exist.projects.oryapis.com',
       forceCookieSecure: true,
       forceCookieDomain: 'some-domain'
     })
 
-    const response = await request(app).get(
+    const response = await request(app.app).get(
       '/?paths=api&paths=kratos&paths=public&paths=health&paths=alive'
     )
 
