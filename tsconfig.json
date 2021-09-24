@@ -6,6 +6,7 @@
     "noImplicitAny": true,
     "outDir": "dist",
     "esModuleInterop": true,
+    "resolveJsonModule": true,
     "rootDir": "src",
     "typeRoots": ["node_modules/@types"]
   },

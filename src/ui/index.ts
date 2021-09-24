@@ -24,16 +24,12 @@ export const getNodeLabel = (node: UiNode): string => {
   }
 
   if (isUiNodeInputAttributes(attributes)) {
-    if (attributes.label.text) {
+    if (attributes.label?.text) {
       return attributes.label.text
     }
   }
 
-  if (node.meta.label?.text) {
-    return node.meta.label.text
-  }
-
-  return ''
+  return node.meta.label?.text || ''
 }
 
 /**

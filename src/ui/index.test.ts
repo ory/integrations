@@ -1,22 +1,25 @@
 import { UiNode } from '@ory/client'
-import { filterNodesByGroups } from './index'
+import { filterNodesByGroups, getNodeLabel } from './index'
+import nodes from './fixtures/nodes.json'
 
 describe('generic helpers', () => {
-  const nodes: Array<Partial<UiNode>> = [
-    { group: 'default', type: 'a' },
-    { group: 'foo', type: 'b' },
-    { group: 'bar', type: 'c' }
-  ]
+  test('filterNodesByGroups', () => {
+    const nodes: Array<Partial<UiNode>> = [
+      { group: 'default', type: 'a' },
+      { group: 'foo', type: 'b' },
+      { group: 'bar', type: 'c' }
+    ]
 
-  test('filterNodesByGroups', async () => {
-    expect(filterNodesByGroups(nodes as Array<UiNode>, 'foo,bar')).toEqual(
-      nodes
-    )
-    expect(filterNodesByGroups(nodes as Array<UiNode>, ['foo', 'bar'])).toEqual(
-      nodes
-    )
-    expect(filterNodesByGroups(nodes as Array<UiNode>, ['foo'], true)).toEqual([
+    const uiNodes = nodes as Array<UiNode>
+
+    expect(filterNodesByGroups(uiNodes, 'foo,bar')).toEqual(nodes)
+    expect(filterNodesByGroups(uiNodes, ['foo', 'bar'])).toEqual(nodes)
+    expect(filterNodesByGroups(uiNodes, ['foo'], true)).toEqual([
       { group: 'foo', type: 'b' }
     ])
+  })
+
+  test('getNodeLabel', () => {
+    expect(nodes.map(getNodeLabel)).toMatchSnapshot()
   })
 })
