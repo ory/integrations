@@ -1,4 +1,4 @@
 import * as nextjs from './nextjs'
-import * as ts from './ts/index'
+import * as ui from './ui'
 
-export { nextjs, ts }
+export { nextjs, ui }
