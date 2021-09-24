@@ -1,4 +1,4 @@
-name: Release NPM Package
+name: Run tests
 on:
   pull_request:
   push:
