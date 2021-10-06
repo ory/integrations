@@ -26,9 +26,7 @@ following contents:
 ```typescript
 import { config, createApiHandler } from '@ory/integrations/nextjs'
 
-export {
-  config
-}
+export { config }
 
 export default createApiHandler({
   /* ... */
@@ -42,7 +40,8 @@ a list of available options head over to
 
 ## SDK Helpers
 
-This package contains several helpers for using the Ory SDKs with TypeScript, JavaScript, and NodeJS.
+This package contains several helpers for using the Ory SDKs with TypeScript,
+JavaScript, and NodeJS.
 
 ### Type Guards
 
@@ -67,6 +66,8 @@ if (isUiNodeImageAttributes(node.attributes)) {
 
 This package contains convenience functions for UI nodes:
 
-- `import { getNodeLabel } from '@ory/integrations/ui'`: Returns the node's label.
+- `import { getNodeLabel } from '@ory/integrations/ui'`: Returns the node's
+  label.
 - `import { getNodeId } from '@ory/integrations/ui'`: Returns a node's ID.
-- `import { filterNodesByGroups } from '@ory/integrations/ui'`: Filters nodes by their groups.
+- `import { filterNodesByGroups } from '@ory/integrations/ui'`: Filters nodes by
+  their groups.
