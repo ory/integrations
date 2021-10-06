@@ -1,4 +1,4 @@
-import { UiNode } from '@ory/client'
+import { UiNode } from '@ory/kratos-client'
 import { filterNodesByGroups, getNodeLabel } from './index'
 import nodes from './fixtures/nodes.json'
 

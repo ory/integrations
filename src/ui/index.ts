@@ -4,13 +4,14 @@ import {
   UiNodeAttributes,
   UiNodeImageAttributes,
   UiNodeInputAttributes,
+  UiNodeScriptAttributes,
   UiNodeTextAttributes
-} from '@ory/client'
+} from '@ory/kratos-client'
 
 /**
  * Returns the node's label.
  *
- * @param node
+ * @param attrs
  * @return label
  */
 export const getNodeLabel = (node: UiNode): string => {
@@ -35,45 +36,56 @@ export const getNodeLabel = (node: UiNode): string => {
 /**
  * A TypeScript type guard for nodes of the type <a>
  *
- * @param node
+ * @param attrs
  */
 export function isUiNodeAnchorAttributes(
-  node: UiNodeAttributes
-): node is UiNodeAnchorAttributes {
-  return (node as UiNodeAnchorAttributes).href !== undefined
+  attrs: UiNodeAttributes
+): attrs is UiNodeAnchorAttributes {
+  return attrs.node_type === 'a'
 }
 
 /**
  * A TypeScript type guard for nodes of the type <img>
  *
- * @param node
+ * @param attrs
  */
 export function isUiNodeImageAttributes(
-  node: UiNodeAttributes
-): node is UiNodeImageAttributes {
-  return (node as UiNodeImageAttributes).src !== undefined
+  attrs: UiNodeAttributes
+): attrs is UiNodeImageAttributes {
+  return attrs.node_type === 'img'
 }
 
 /**
  * A TypeScript type guard for nodes of the type <input>
  *
- * @param node
+ * @param attrs
  */
 export function isUiNodeInputAttributes(
-  node: UiNodeAttributes
-): node is UiNodeInputAttributes {
-  return (node as UiNodeInputAttributes).name !== undefined
+  attrs: UiNodeAttributes
+): attrs is UiNodeInputAttributes {
+  return attrs.node_type === 'input'
 }
 
 /**
  * A TypeScript type guard for nodes of the type <span>{text}</span>
  *
- * @param node
+ * @param attrs
  */
 export function isUiNodeTextAttributes(
-  node: UiNodeAttributes
-): node is UiNodeTextAttributes {
-  return (node as UiNodeTextAttributes).text !== undefined
+  attrs: UiNodeAttributes
+): attrs is UiNodeTextAttributes {
+  return attrs.node_type === 'text'
+}
+
+/**
+ * A TypeScript type guard for nodes of the type <script>
+ *
+ * @param attrs
+ */
+export function isUiNodeScriptAttributes(
+  attrs: UiNodeAttributes
+): attrs is UiNodeScriptAttributes {
+  return attrs.node_type === 'script'
 }
 
 /**
@@ -94,7 +106,7 @@ export function getNodeId({ attributes }: UiNode) {
  *
  * Will always add default nodes unless `withoutDefaultGroup` is true.
  *
- * @param nodes
+ * @param attrss
  * @param groups
  * @param withoutDefaultGroup
  */

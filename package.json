@@ -38,13 +38,15 @@
   },
   "peerDependencies": {
     "next": ">=11.0.0",
-    "@ory/client": "^0.0.1-alpha.19"
+    "@ory/client": "^0.0.1-alpha.19",
+    "@ory/kratos-client": "^0.0.0-next.04fdf92d4fc5"
   },
   "main": "dist/index.js",
   "module": "dist/index.mjs",
   "typings": "dist/index.d.ts",
   "dependencies": {
     "@ory/client": "^0.0.1-alpha.19",
+    "@ory/kratos-client": "^0.0.0-next.04fdf92d4fc5",
     "cookie": "^0.4.1",
     "next": ">=11.0.0",
     "ory-prettier-styles": "^1.1.2",
