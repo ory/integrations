@@ -11,7 +11,7 @@
   "scripts": {
     "format": "prettier --write ${npm_package_config_prettierTarget}",
     "format:check": "prettier --check ${npm_package_config_prettierTarget}",
-    "build": "rm -rf dist && rollup -c",
+    "build": "rm -rf dist ui nextjs && rollup -c",
     "prepublishOnly": "npm run build",
     "test": "jest"
   },
@@ -41,9 +41,6 @@
     "@ory/client": "^0.0.1-alpha.19",
     "@ory/kratos-client": "^0.0.0-next.04fdf92d4fc5"
   },
-  "main": "dist/index.js",
-  "module": "dist/index.mjs",
-  "typings": "dist/index.d.ts",
   "dependencies": {
     "@ory/client": "^0.0.1-alpha.19",
     "@ory/kratos-client": "^0.0.0-next.04fdf92d4fc5",

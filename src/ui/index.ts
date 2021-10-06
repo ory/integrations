@@ -89,7 +89,7 @@ export function isUiNodeScriptAttributes(
 }
 
 /**
- * Returns a node's ID
+ * Returns a node's ID.
  *
  * @param attributes
  */

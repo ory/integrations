@@ -24,10 +24,13 @@ Then, add create a file at `<your-nextjs-app>/api/.ory/[...paths.ts]` with the
 following contents:
 
 ```typescript
-import { nextjs } from '@ory/integrations'
+import { config, createApiHandler } from '@ory/integrations/nextjs'
 
-export const config = nextjs.config
-export default nextjs.createApiHandler({
+export {
+  config
+}
+
+export default createApiHandler({
   /* ... */
 })
 ```
@@ -36,3 +39,34 @@ You need to set the environment variable `ORY_SDK_URL` to your
 [Ory Cloud Project SDK URL](https://www.ory.sh/docs/concepts/services-api). For
 a list of available options head over to
 [`src/nextjs/index.ts`](src/nextjs/index.ts).
+
+## SDK Helpers
+
+This package contains several helpers for using the Ory SDKs with TypeScript, JavaScript, and NodeJS.
+
+### Type Guards
+
+This package includes type guards for identifying UI nodes.
+
+```tsimport {
+  isUiNodeImageAttributes,
+  isUiNodeInputAttributes,
+  isUiNodeScriptAttributes,
+  isUiNodeTextAttributes,
+  // ...
+} from '@ory/integrations/ui'
+
+// ...
+
+if (isUiNodeImageAttributes(node.attributes)) {
+  console.log("it is an image": node.attributes.src)
+}
+```
+
+### UI Node Helpers
+
+This package contains convenience functions for UI nodes:
+
+- `import { getNodeLabel } from '@ory/integrations/ui'`: Returns the node's label.
+- `import { getNodeId } from '@ory/integrations/ui'`: Returns a node's ID.
+- `import { filterNodesByGroups } from '@ory/integrations/ui'`: Filters nodes by their groups.

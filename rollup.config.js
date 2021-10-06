@@ -1,25 +1,23 @@
 import dts from 'rollup-plugin-dts'
 import esbuild from 'rollup-plugin-esbuild'
 
-const name = require('./package.json').main.replace(/\.js$/, '')
-
 const bundle = (config) => ({
   ...config,
-  input: 'src/index.ts',
   external: (id) => !/^[./]/.test(id)
 })
 
 export default [
   bundle({
     plugins: [esbuild()],
+    input: 'src/ui/index.ts',
     output: [
       {
-        file: `${name}.js`,
+        file: `ui/index.js`,
         format: 'cjs',
         sourcemap: true
       },
       {
-        file: `${name}.mjs`,
+        file: `ui/index.mjs`,
         format: 'es',
         sourcemap: true
       }
@@ -27,8 +25,33 @@ export default [
   }),
   bundle({
     plugins: [dts()],
+    input: 'src/ui/index.ts',
     output: {
-      file: `${name}.d.ts`,
+      file: `ui/index.d.ts`,
+      format: 'es'
+    }
+  }),
+  bundle({
+    plugins: [esbuild()],
+    input: 'src/nextjs/index.ts',
+    output: [
+      {
+        file: `nextjs/index.js`,
+        format: 'cjs',
+        sourcemap: true
+      },
+      {
+        file: `nextjs/index.mjs`,
+        format: 'es',
+        sourcemap: true
+      }
+    ]
+  }),
+  bundle({
+    plugins: [dts()],
+    input: 'src/nextjs/index.ts',
+    output: {
+      file: `nextjs/index.d.ts`,
       format: 'es'
     }
   })
