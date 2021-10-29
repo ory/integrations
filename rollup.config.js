@@ -54,5 +54,29 @@ export default [
       file: `nextjs/index.d.ts`,
       format: 'es'
     }
+  }),
+  bundle({
+    plugins: [esbuild()],
+    input: 'src/routes/index.ts',
+    output: [
+      {
+        file: `routes/index.js`,
+        format: 'cjs',
+        sourcemap: true
+      },
+      {
+        file: `routes/index.mjs`,
+        format: 'es',
+        sourcemap: true
+      }
+    ]
+  }),
+  bundle({
+    plugins: [dts()],
+    input: 'src/routes/index.ts',
+    output: {
+      file: `routes/index.d.ts`,
+      format: 'es'
+    }
   })
 ]
