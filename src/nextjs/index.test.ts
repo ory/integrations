@@ -66,8 +66,6 @@ describe('NextJS handler', () => {
       expect(domain).toBeUndefined()
       expect(secure).toBeFalsy()
     })
-
-    done()
   })
 
   test('uses the options correctly', async () => {
