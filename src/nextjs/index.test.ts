@@ -52,6 +52,7 @@ describe('NextJS handler', () => {
     const response = await supertest(app.app)
       .get('/?paths=api&paths=kratos&paths=public&paths=health&paths=alive')
       .expect(200)
+      .then((res) => res)
 
     expect(response.body.status).toBe('ok')
     expect(response.headers['set-cookie']).toBeDefined()
@@ -77,6 +78,7 @@ describe('NextJS handler', () => {
     const response = await supertest(app.app)
       .get('/?paths=api&paths=kratos&paths=public&paths=health&paths=alive')
       .expect(404)
+      .then((res) => res)
     expect(response.headers['set-cookie']).toBeDefined()
 
     const cookies = parse(response.headers['set-cookie'])
@@ -99,6 +101,7 @@ describe('NextJS handler', () => {
     const response = await supertest(app.app)
       .get('/?paths=api&paths=kratos&paths=public&paths=health&paths=alive')
       .expect(200)
+      .then((res) => res)
     expect(response.body.status).toBe('ok')
   })
 
@@ -116,6 +119,7 @@ describe('NextJS handler', () => {
         '/api/.ory/api/kratos/public/self-service/login/browser'
       )
       .expect(303)
+      .then((res) => res)
   })
 
   test('updates the contents of JSON', async () => {
