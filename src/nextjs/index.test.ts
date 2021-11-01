@@ -49,11 +49,10 @@ describe('NextJS handler', () => {
       forceCookieSecure: false
     })
 
-    const response = await supertest(app.app).get(
-      '/?paths=api&paths=kratos&paths=public&paths=health&paths=alive'
-    )
+    const response = await supertest(app.app)
+      .get('/?paths=api&paths=kratos&paths=public&paths=health&paths=alive')
+      .expect(200)
 
-    expect(response.statusCode).toBe(200)
     expect(response.body.status).toBe('ok')
     expect(response.headers['set-cookie']).toBeDefined()
 
@@ -75,11 +74,9 @@ describe('NextJS handler', () => {
       forceCookieDomain: 'some-domain'
     })
 
-    const response = await supertest(app.app).get(
-      '/?paths=api&paths=kratos&paths=public&paths=health&paths=alive'
-    )
-
-    expect(response.statusCode).toBe(404)
+    const response = await supertest(app.app)
+      .get('/?paths=api&paths=kratos&paths=public&paths=health&paths=alive')
+      .expect(404)
     expect(response.headers['set-cookie']).toBeDefined()
 
     const cookies = parse(response.headers['set-cookie'])
@@ -99,11 +96,9 @@ describe('NextJS handler', () => {
       fallbackToPlayground: true
     })
 
-    const response = await supertest(app.app).get(
-      '/?paths=api&paths=kratos&paths=public&paths=health&paths=alive'
-    )
-
-    expect(response.statusCode).toBe(200)
+    const response = await supertest(app.app)
+      .get('/?paths=api&paths=kratos&paths=public&paths=health&paths=alive')
+      .expect(200)
     expect(response.body.status).toBe('ok')
   })
 
