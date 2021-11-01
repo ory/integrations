@@ -32,8 +32,11 @@ function createApp(options: CreateApiHandlerOptions): AppResult {
 describe('NextJS handler', () => {
   let app: AppResult
 
-  afterEach(() => {
-    app?.server.close()
+  afterEach((done) => {
+    if (!app) {
+      done()
+    }
+    app.server.close(done)
   })
 
   test('returns the alive status code', async () => {
