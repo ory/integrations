@@ -32,10 +32,6 @@ function createApp(options: CreateApiHandlerOptions): AppResult {
 describe('NextJS handler', () => {
   let app: AppResult
 
-  afterAll(async () => {
-    await new Promise<void>((resolve) => setTimeout(() => resolve(), 500)) // avoid jest open handle error
-  })
-
   afterEach((done) => {
     if (!app) {
       done()
