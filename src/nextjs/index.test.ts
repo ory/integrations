@@ -32,6 +32,10 @@ function createApp(options: CreateApiHandlerOptions): AppResult {
 describe('NextJS handler', () => {
   let app: AppResult
 
+  afterAll(async () => {
+    await new Promise<void>((resolve) => setTimeout(() => resolve(), 500)) // avoid jest open handle error
+  })
+
   afterEach((done) => {
     if (!app) {
       done()
@@ -39,7 +43,7 @@ describe('NextJS handler', () => {
     app.server.close(done)
   })
 
-  test('returns the alive status code', async () => {
+  test('returns the alive status code', async (done) => {
     app = createApp({
       apiBaseUrlOverride: 'https://playground.projects.oryapis.com',
       forceCookieSecure: false
@@ -62,6 +66,8 @@ describe('NextJS handler', () => {
       expect(domain).toBeUndefined()
       expect(secure).toBeFalsy()
     })
+
+    done()
   })
 
   test('uses the options correctly', async () => {
