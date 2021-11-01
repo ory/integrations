@@ -72,8 +72,6 @@ describe('NextJS handler', () => {
       '/?paths=api&paths=kratos&paths=public&paths=health&paths=alive'
     )
 
-    console.log(response.body, response.headers, response.statusCode)
-
     expect(response.statusCode).toBe(404)
     expect(response.headers['set-cookie']).toBeDefined()
 
