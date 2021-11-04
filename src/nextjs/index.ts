@@ -2,6 +2,7 @@ import request from 'request'
 import { NextApiRequest, NextApiResponse } from 'next'
 import { CookieSerializeOptions, serialize } from 'cookie'
 import parse from 'set-cookie-parser'
+import { IncomingHttpHeaders } from 'http'
 
 /**
  * The NextJS API configuration
@@ -74,9 +75,27 @@ export function createApiHandler(options: CreateApiHandlerOptions) {
 
     const path = Array.isArray(paths) ? paths.join('/') : paths
     const url = `${baseUrl}/${path}?${search.toString()}`
+
+    let body = ''
+    let code = 0
+    let headers: IncomingHttpHeaders
     req
-      .pipe(request(url))
+      .pipe(
+        request(url, {
+          followAllRedirects: false,
+          followRedirect: false,
+          gzip: true,
+          json: false
+        })
+      )
       .on('response', (res) => {
+        if (res.headers.location) {
+          res.headers.location = res.headers.location.replace(
+            baseUrl,
+            '/api/.ory'
+          )
+        }
+
         res.headers['set-cookie'] = parse(res)
           .map((cookie) => ({
             ...cookie,
@@ -90,7 +109,26 @@ export function createApiHandler(options: CreateApiHandlerOptions) {
           .map(({ value, name, ...options }) =>
             serialize(name, value, options as CookieSerializeOptions)
           )
+
+        headers = res.headers
+        code = res.statusCode
       })
-      .pipe(res)
+      .on('data', (chunk) => {
+        body += chunk.toString()
+      })
+      .on('end', () => {
+        delete headers['transfer-encoding']
+        delete headers['content-encoding']
+        delete headers['content-length']
+
+        Object.keys(headers).forEach((key) => {
+          res.setHeader(key, headers[key])
+        })
+
+        res.status(code)
+        if (body.length > 0) {
+          res.send(body.replaceAll(baseUrl, '/api/.ory'))
+        }
+      })
   }
 }

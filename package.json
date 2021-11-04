@@ -13,7 +13,7 @@
     "format:check": "prettier --check ${npm_package_config_prettierTarget}",
     "build": "rm -rf dist ui nextjs && rollup -c",
     "prepublishOnly": "npm run build",
-    "test": "jest"
+    "test": "jest --detectOpenHandles"
   },
   "devDependencies": {
     "@babel/core": "^7.15.5",
@@ -37,13 +37,13 @@
     "typescript": "^4.4.3"
   },
   "peerDependencies": {
-    "next": ">=11.0.0",
     "@ory/client": ">=0.0.1-alpha.21",
-    "@ory/kratos-client": ">=0.8.0-alpha.2"
+    "@ory/kratos-client": ">=0.8.0-alpha.2",
+    "next": ">=11.0.0"
   },
   "dependencies": {
-    "@ory/client": "0.0.1-alpha.21",
-    "@ory/kratos-client": "0.8.0-alpha.2",
+    "@ory/client": ">=0.0.1-alpha.21",
+    "@ory/kratos-client": ">=0.8.0-alpha.2",
     "cookie": "^0.4.1",
     "next": ">=11.0.0",
     "ory-prettier-styles": "^1.1.2",
