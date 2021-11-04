@@ -39,29 +39,49 @@ describe('NextJS handler', () => {
     app.server.close(done)
   })
 
-  test('returns the alive status code', async (done) => {
+  test('returns the alive status code', (done) => {
     app = createApp({
       apiBaseUrlOverride: 'https://playground.projects.oryapis.com',
       forceCookieSecure: false
     })
 
-    const response = await supertest(app.app)
+    supertest(app.app)
       .get('/?paths=api&paths=kratos&paths=public&paths=health&paths=alive')
       .expect(200)
-      .then((res) => res)
+      .then((res) => {
+        expect(res.body.status).toBe('ok')
+        done()
+      })
+      .catch(done)
+  })
 
-    expect(response.body.status).toBe('ok')
-    expect(response.headers['set-cookie']).toBeDefined()
-
-    const cookies = parse(response.headers['set-cookie'])
-    expect(
-      cookies.find(({ name }) => name.indexOf('csrf_token') > -1)
-    ).toBeDefined()
-
-    cookies.forEach(({ domain, secure }) => {
-      expect(domain).toBeUndefined()
-      expect(secure).toBeFalsy()
+  test('sets the appropriate cookies', (done) => {
+    app = createApp({
+      apiBaseUrlOverride: 'https://playground.projects.oryapis.com',
+      forceCookieSecure: false
     })
+
+    supertest(app.app)
+      .get(
+        '/?paths=api&paths=kratos&paths=public&paths=self-service&paths=login&paths=browser'
+      )
+      .expect(303)
+      .then((res) => {
+        expect(res.headers['set-cookie']).toBeDefined()
+
+        const cookies = parse(res.headers['set-cookie'])
+        expect(
+          cookies.find(({ name }) => name.indexOf('csrf_token') > -1)
+        ).toBeDefined()
+
+        cookies.forEach(({ domain, secure }) => {
+          expect(domain).toBeUndefined()
+          expect(secure).toBeFalsy()
+        })
+
+        done()
+      })
+      .catch(done)
   })
 
   test('uses the options correctly', async () => {
@@ -75,6 +95,7 @@ describe('NextJS handler', () => {
       .get('/?paths=api&paths=kratos&paths=public&paths=health&paths=alive')
       .expect(404)
       .then((res) => res)
+
     expect(response.headers['set-cookie']).toBeDefined()
 
     const cookies = parse(response.headers['set-cookie'])
@@ -107,15 +128,14 @@ describe('NextJS handler', () => {
       fallbackToPlayground: true
     })
 
-    const response = await supertest(app.app)
+    await supertest(app.app)
       .get('/?paths=ui&paths=login')
       .redirects(0)
       .expect(
         'Location',
-        '/api/.ory/api/kratos/public/self-service/login/browser'
+        '../api/kratos/public/self-service/login/browser?aal=&refresh=&return_to='
       )
       .expect(303)
-      .then((res) => res)
   })
 
   test('updates the contents of JSON', async () => {
