@@ -47,7 +47,8 @@ JavaScript, and NodeJS.
 
 This package includes type guards for identifying UI nodes.
 
-```tsimport {
+```ts
+import {
   isUiNodeImageAttributes,
   isUiNodeInputAttributes,
   isUiNodeScriptAttributes,
