@@ -86,6 +86,11 @@ export function createApiHandler(options: CreateApiHandlerOptions) {
       return
     }
 
+    const isTls =
+      (req as unknown as { protocol: string }).protocol === 'https:' ||
+      (req as unknown as { secure: boolean }).secure ||
+      req.headers['x-forwarded-proto'] === 'https'
+
     let buf = Buffer.alloc(0)
     let code = 0
     let headers: IncomingHttpHeaders
@@ -101,20 +106,27 @@ export function createApiHandler(options: CreateApiHandlerOptions) {
         )
         .on('response', (res) => {
           if (res.headers.location) {
-            res.headers.location = res.headers.location.replace(
-              baseUrl,
-              '/api/.ory'
-            )
+            if (res.headers.location.indexOf(baseUrl) === 0) {
+              res.headers.location = res.headers.location.replace(
+                baseUrl,
+                '/api/.ory'
+              )
+            } else if (
+              res.headers.location.indexOf('/api/kratos/public/') === 0
+            ) {
+              res.headers.location = '/api/.ory' + res.headers.location
+            }
           }
 
+          const secure =
+            options.forceCookieSecure === undefined
+              ? isTls
+              : options.forceCookieSecure
           res.headers['set-cookie'] = parse(res)
             .map((cookie) => ({
               ...cookie,
               domain: options.forceCookieDomain,
-              secure:
-                options.forceCookieSecure === undefined
-                  ? process.env.VERCEL_ENV !== 'development'
-                  : options.forceCookieSecure,
+              secure,
               encode
             }))
             .map(({ value, name, ...options }) =>

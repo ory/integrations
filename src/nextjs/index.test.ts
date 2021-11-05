@@ -57,8 +57,7 @@ describe('NextJS handler', () => {
 
   test('sets the appropriate cookies', (done) => {
     app = createApp({
-      apiBaseUrlOverride: 'https://playground.projects.oryapis.com',
-      forceCookieSecure: false
+      apiBaseUrlOverride: 'https://playground.projects.oryapis.com'
     })
 
     supertest(app.app)
@@ -77,6 +76,35 @@ describe('NextJS handler', () => {
         cookies.forEach(({ domain, secure }) => {
           expect(domain).toBeUndefined()
           expect(secure).toBeFalsy()
+        })
+
+        done()
+      })
+      .catch(done)
+  })
+
+  test('sets secure true if a TLS connection', (done) => {
+    app = createApp({
+      apiBaseUrlOverride: 'https://playground.projects.oryapis.com'
+    })
+
+    supertest(app.app)
+      .get(
+        '/?paths=api&paths=kratos&paths=public&paths=self-service&paths=login&paths=browser'
+      )
+      .set('x-forwarded-proto', 'https')
+      .expect(303)
+      .then((res) => {
+        expect(res.headers['set-cookie']).toBeDefined()
+
+        const cookies = parse(res.headers['set-cookie'])
+        expect(
+          cookies.find(({ name }) => name.indexOf('csrf_token') > -1)
+        ).toBeDefined()
+
+        cookies.forEach(({ domain, secure }) => {
+          expect(domain).toBeUndefined()
+          expect(secure).toBeTruthy()
         })
 
         done()
@@ -149,6 +177,22 @@ describe('NextJS handler', () => {
       .redirects(0)
       .expect('Location', '../../../')
       .expect(303)
+  })
+
+  test('redirects to login if we access settings without a session', async () => {
+    app = createApp({
+      forceCookieSecure: false,
+      fallbackToPlayground: true
+    })
+
+    await supertest(app.app)
+      .get('/?paths=ui&paths=settings')
+      .redirects(0)
+      .expect(
+        'Location',
+        '/api/.ory/api/kratos/public/self-service/login/browser'
+      )
+      .expect(302)
   })
 
   test('updates the contents of JSON', async () => {
