@@ -76,6 +76,14 @@ export function createApiHandler(options: CreateApiHandlerOptions) {
     const path = Array.isArray(paths) ? paths.join('/') : paths
     const url = `${baseUrl}/${path}?${search.toString()}`
 
+    if (path === 'ui/welcome') {
+      // A special for redirecting to the home page
+      // if we were being redirected to the hosted UI
+      // welcome page.
+      res.redirect(303, '../../../')
+      return
+    }
+
     let body = ''
     let code = 0
     let headers: IncomingHttpHeaders
