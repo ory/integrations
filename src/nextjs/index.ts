@@ -3,6 +3,8 @@ import { NextApiRequest, NextApiResponse } from 'next'
 import { CookieSerializeOptions, serialize } from 'cookie'
 import parse from 'set-cookie-parser'
 import { IncomingHttpHeaders } from 'http'
+import { Buffer } from 'buffer'
+import { isText } from 'istextorbinary'
 
 /**
  * The NextJS API configuration
@@ -84,7 +86,7 @@ export function createApiHandler(options: CreateApiHandlerOptions) {
       return
     }
 
-    let body = ''
+    let buf = Buffer.alloc(0)
     let code = 0
     let headers: IncomingHttpHeaders
     return new Promise<void>((resolve) => {
@@ -122,8 +124,8 @@ export function createApiHandler(options: CreateApiHandlerOptions) {
           headers = res.headers
           code = res.statusCode
         })
-        .on('data', (chunk) => {
-          body += chunk.toString()
+        .on('data', (chunk: Buffer) => {
+          buf = Buffer.concat([buf, chunk], buf.length + chunk.length)
         })
         .on('end', () => {
           delete headers['transfer-encoding']
@@ -135,12 +137,15 @@ export function createApiHandler(options: CreateApiHandlerOptions) {
           })
 
           res.status(code)
-          if (body.length > 0) {
-            res.send(body.replaceAll(baseUrl, '/api/.ory'))
-          } else {
-            res.end()
+          if (buf.length > 0) {
+            if (isText(null, buf)) {
+              res.send(buf.toString('utf-8').replaceAll(baseUrl, '/api/.ory'))
+            } else {
+              res.write(buf)
+            }
           }
 
+          res.end()
           resolve()
         })
     })
