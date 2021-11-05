@@ -45,6 +45,7 @@
     "@ory/client": ">=0.0.1-alpha.21",
     "@ory/kratos-client": ">=0.8.0-alpha.2",
     "cookie": "^0.4.1",
+    "istextorbinary": "^6.0.0",
     "next": ">=11.0.0",
     "ory-prettier-styles": "^1.1.2",
     "prettier": "^2.3.2",
