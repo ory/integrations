@@ -151,7 +151,11 @@ export function createApiHandler(options: CreateApiHandlerOptions) {
           res.status(code)
           if (buf.length > 0) {
             if (isText(null, buf)) {
-              res.send(buf.toString('utf-8').replaceAll(baseUrl, '/api/.ory'))
+              res.send(
+                buf
+                  .toString('utf-8')
+                  .replace(new RegExp(baseUrl, 'g'), '/api/.ory')
+              )
             } else {
               res.write(buf)
             }

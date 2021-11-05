@@ -5,6 +5,7 @@ import supertest from 'supertest'
 import parse from 'set-cookie-parser'
 import http from 'http'
 import { Application } from 'express-serve-static-core'
+import DoneCallback = jest.DoneCallback
 
 interface AppResult {
   app: Application
@@ -32,9 +33,6 @@ describe('NextJS handler', () => {
   let app: AppResult
 
   afterEach((done) => {
-    if (!app) {
-      done()
-    }
     app.server.close(done)
   })
 
@@ -237,7 +235,7 @@ describe('NextJS handler', () => {
 
     expect(response.headers['location']).toContain('/api/.ory/ui/login')
     const loc = response.headers['location']
-      .replaceAll('/api/.ory/', '')
+      .replace('/api/.ory/', '')
       .split('/')
       .map((p: string) => `paths=${p}`)
       .join('&')
