@@ -79,56 +79,62 @@ export function createApiHandler(options: CreateApiHandlerOptions) {
     let body = ''
     let code = 0
     let headers: IncomingHttpHeaders
-    req
-      .pipe(
-        request(url, {
-          followAllRedirects: false,
-          followRedirect: false,
-          gzip: true,
-          json: false
+    return new Promise<void>((resolve) => {
+      req
+        .pipe(
+          request(url, {
+            followAllRedirects: false,
+            followRedirect: false,
+            gzip: true,
+            json: false
+          })
+        )
+        .on('response', (res) => {
+          if (res.headers.location) {
+            res.headers.location = res.headers.location.replace(
+              baseUrl,
+              '/api/.ory'
+            )
+          }
+
+          res.headers['set-cookie'] = parse(res)
+            .map((cookie) => ({
+              ...cookie,
+              domain: options.forceCookieDomain,
+              secure:
+                options.forceCookieSecure === undefined
+                  ? process.env.VERCEL_ENV !== 'development'
+                  : options.forceCookieSecure,
+              encode
+            }))
+            .map(({ value, name, ...options }) =>
+              serialize(name, value, options as CookieSerializeOptions)
+            )
+
+          headers = res.headers
+          code = res.statusCode
         })
-      )
-      .on('response', (res) => {
-        if (res.headers.location) {
-          res.headers.location = res.headers.location.replace(
-            baseUrl,
-            '/api/.ory'
-          )
-        }
-
-        res.headers['set-cookie'] = parse(res)
-          .map((cookie) => ({
-            ...cookie,
-            domain: options.forceCookieDomain,
-            secure:
-              options.forceCookieSecure === undefined
-                ? process.env.VERCEL_ENV !== 'development'
-                : options.forceCookieSecure,
-            encode
-          }))
-          .map(({ value, name, ...options }) =>
-            serialize(name, value, options as CookieSerializeOptions)
-          )
-
-        headers = res.headers
-        code = res.statusCode
-      })
-      .on('data', (chunk) => {
-        body += chunk.toString()
-      })
-      .on('end', () => {
-        delete headers['transfer-encoding']
-        delete headers['content-encoding']
-        delete headers['content-length']
-
-        Object.keys(headers).forEach((key) => {
-          res.setHeader(key, headers[key])
+        .on('data', (chunk) => {
+          body += chunk.toString()
         })
+        .on('end', () => {
+          delete headers['transfer-encoding']
+          delete headers['content-encoding']
+          delete headers['content-length']
 
-        res.status(code)
-        if (body.length > 0) {
-          res.send(body.replaceAll(baseUrl, '/api/.ory'))
-        }
-      })
+          Object.keys(headers).forEach((key) => {
+            res.setHeader(key, headers[key])
+          })
+
+          res.status(code)
+          if (body.length > 0) {
+            res.send(body.replaceAll(baseUrl, '/api/.ory'))
+          } else {
+            res.end()
+          }
+
+          resolve()
+        })
+    })
   }
 }
