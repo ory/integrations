@@ -137,6 +137,18 @@ describe('NextJS handler', () => {
       )
       .expect(303)
   })
+  test('redirects home if we end up at the welcome page', async () => {
+    app = createApp({
+      forceCookieSecure: false,
+      fallbackToPlayground: true
+    })
+
+    await supertest(app.app)
+      .get('/?paths=ui')
+      .redirects(0)
+      .expect('Location', '/')
+      .expect(303)
+  })
 
   test('updates the contents of JSON', async () => {
     app = createApp({
