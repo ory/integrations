@@ -137,6 +137,7 @@ describe('NextJS handler', () => {
       )
       .expect(303)
   })
+
   test('redirects home if we end up at the welcome page', async () => {
     app = createApp({
       forceCookieSecure: false,
@@ -144,9 +145,9 @@ describe('NextJS handler', () => {
     })
 
     await supertest(app.app)
-      .get('/?paths=ui')
+      .get('/?paths=ui&paths=welcome')
       .redirects(0)
-      .expect('Location', '/')
+      .expect('Location', '../../../')
       .expect(303)
   })
 
