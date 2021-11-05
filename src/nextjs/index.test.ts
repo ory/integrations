@@ -2,7 +2,6 @@ import { createApiHandler, CreateApiHandlerOptions } from './index'
 import express from 'express'
 import { NextApiRequest, NextApiResponse } from 'next'
 import supertest from 'supertest'
-import request from 'request'
 import parse from 'set-cookie-parser'
 import http from 'http'
 import { Application } from 'express-serve-static-core'
@@ -211,6 +210,17 @@ describe('NextJS handler', () => {
     expect(response.ui.action).toContain(
       '/api/.ory/api/kratos/public/self-service/login?flow='
     )
+  })
+
+  test('should work with binaries', async () => {
+    app = createApp({
+      forceCookieSecure: false,
+      fallbackToPlayground: true
+    })
+
+    const response = await supertest(app.app)
+      .get('/?paths=ui&paths=ory.png')
+      .expect(200)
   })
 
   test('updates the contents of HTML', async () => {
