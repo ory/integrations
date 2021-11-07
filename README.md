@@ -33,7 +33,7 @@ export default createApiHandler({
 })
 ```
 
-You need to set the environment variable `ORY_SDK_URL` to your
+You need to set the environment variable `ORY_KRATOS_URL` to your
 [Ory Cloud Project SDK URL](https://www.ory.sh/docs/concepts/services-api). For
 a list of available options head over to
 [`src/nextjs/index.ts`](src/next-edge/index.ts).
@@ -59,7 +59,7 @@ import {
 // ...
 
 if (isUiNodeImageAttributes(node.attributes)) {
-  console.log("it is an image": node.attributes.src)
+  console.log("it is an image: ", node.attributes.src)
 }
 ```
 
