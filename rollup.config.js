@@ -6,77 +6,33 @@ const bundle = (config) => ({
   external: (id) => !/^[./]/.test(id)
 })
 
-export default [
-  bundle({
-    plugins: [esbuild()],
-    input: 'src/ui/index.ts',
-    output: [
-      {
-        file: `ui/index.js`,
-        format: 'cjs',
-        sourcemap: true
-      },
-      {
-        file: `ui/index.mjs`,
-        format: 'es',
-        sourcemap: true
+const modules = ['ui', 'routes', 'next-edge', 'next']
+  .map((module) => [
+    bundle({
+      plugins: [esbuild()],
+      input: `src/${module}/index.ts`,
+      output: [
+        {
+          file: `${module}/index.js`,
+          format: 'cjs',
+          sourcemap: true
+        },
+        {
+          file: `${module}/index.mjs`,
+          format: 'es',
+          sourcemap: true
+        }
+      ]
+    }),
+    bundle({
+      plugins: [dts()],
+      input: `src/${module}/index.ts`,
+      output: {
+        file: `${module}/index.d.ts`,
+        format: 'es'
       }
-    ]
-  }),
-  bundle({
-    plugins: [dts()],
-    input: 'src/ui/index.ts',
-    output: {
-      file: `ui/index.d.ts`,
-      format: 'es'
-    }
-  }),
-  bundle({
-    plugins: [esbuild()],
-    input: 'src/nextjs/index.ts',
-    output: [
-      {
-        file: `nextjs/index.js`,
-        format: 'cjs',
-        sourcemap: true
-      },
-      {
-        file: `nextjs/index.mjs`,
-        format: 'es',
-        sourcemap: true
-      }
-    ]
-  }),
-  bundle({
-    plugins: [dts()],
-    input: 'src/nextjs/index.ts',
-    output: {
-      file: `nextjs/index.d.ts`,
-      format: 'es'
-    }
-  }),
-  bundle({
-    plugins: [esbuild()],
-    input: 'src/routes/index.ts',
-    output: [
-      {
-        file: `routes/index.js`,
-        format: 'cjs',
-        sourcemap: true
-      },
-      {
-        file: `routes/index.mjs`,
-        format: 'es',
-        sourcemap: true
-      }
-    ]
-  }),
-  bundle({
-    plugins: [dts()],
-    input: 'src/routes/index.ts',
-    output: {
-      file: `routes/index.d.ts`,
-      format: 'es'
-    }
-  })
-]
+    })
+  ])
+  .reduce((acc, e) => [...acc, ...e], [])
+
+export default modules

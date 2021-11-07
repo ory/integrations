@@ -24,7 +24,7 @@ Then, add create a file at `<your-nextjs-app>/api/.ory/[...paths.ts]` with the
 following contents:
 
 ```typescript
-import { config, createApiHandler } from '@ory/integrations/nextjs'
+import { config, createApiHandler } from '@ory/integrations/next/edge'
 
 export { config }
 
@@ -36,7 +36,7 @@ export default createApiHandler({
 You need to set the environment variable `ORY_SDK_URL` to your
 [Ory Cloud Project SDK URL](https://www.ory.sh/docs/concepts/services-api). For
 a list of available options head over to
-[`src/nextjs/index.ts`](src/nextjs/index.ts).
+[`src/nextjs/index.ts`](src/next-edge/index.ts).
 
 ## SDK Helpers
 

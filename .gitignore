@@ -4,5 +4,6 @@ typings
 dist
 coverage
 ui
-nextjs
+next-edge
+next
 routes

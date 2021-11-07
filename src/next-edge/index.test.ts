@@ -5,7 +5,6 @@ import supertest from 'supertest'
 import parse from 'set-cookie-parser'
 import http from 'http'
 import { Application } from 'express-serve-static-core'
-import DoneCallback = jest.DoneCallback
 
 interface AppResult {
   app: Application
@@ -216,9 +215,7 @@ describe('NextJS handler', () => {
       fallbackToPlayground: true
     })
 
-    const response = await supertest(app.app)
-      .get('/?paths=ui&paths=ory.png')
-      .expect(200)
+    await supertest(app.app).get('/?paths=ui&paths=ory.png').expect(200)
   })
 
   test('updates the contents of HTML', async () => {
