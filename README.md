@@ -24,7 +24,7 @@ Then, add create a file at `<your-nextjs-app>/api/.ory/[...paths.ts]` with the
 following contents:
 
 ```typescript
-import { config, createApiHandler } from '@ory/integrations/next/edge'
+import { config, createApiHandler } from '@ory/integrations/next-edge'
 
 export { config }
 
