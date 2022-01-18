@@ -5,6 +5,7 @@
   "author": "Ory GmbH",
   "prettier": "ory-prettier-styles",
   "license": "Apache-2.0",
+  "repository": "https://github.com/ory/integrations",
   "config": {
     "prettierTarget": "**/*.{tsx,ts,json,md,js,css}"
   },
