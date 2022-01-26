@@ -77,6 +77,20 @@ export function createApiHandler(options: CreateApiHandlerOptions) {
 
   baseUrl = baseUrl.replace(/\/$/, '')
 
+  const forwardedHeaders = [
+    'accept',
+    'accept-charset',
+    'accept-encoding',
+    'accept-language',
+    'authorization',
+    'cache-control',
+    'content-type',
+    'cookie',
+    'host',
+    'user-agent',
+    'referer'
+  ]
+
   return (req: NextApiRequest, res: NextApiResponse<string>) => {
     const { paths, ...query } = req.query
     const search = new URLSearchParams()
@@ -99,6 +113,12 @@ export function createApiHandler(options: CreateApiHandlerOptions) {
       (req as unknown as { protocol: string }).protocol === 'https:' ||
       (req as unknown as { secure: boolean }).secure ||
       req.headers['x-forwarded-proto'] === 'https'
+
+    req.headers = Object.fromEntries(
+      Object.entries(req.headers).filter(([key]) =>
+        forwardedHeaders.includes(key)
+      )
+    )
 
     let buf = Buffer.alloc(0)
     let code = 0
