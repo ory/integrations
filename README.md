@@ -33,9 +33,9 @@ export default createApiHandler({
 })
 ```
 
-You need to set the environment variable `ORY_SDK_URL` or `ORY_KRATOS_URL` to
-your [Ory Cloud Project SDK URL](https://www.ory.sh/docs/concepts/services-api).
-For a list of available options head over to
+You need to set the environment variable `ORY_SDK_URL` to your
+[Ory Cloud Project SDK URL](https://www.ory.sh/docs/concepts/services-api). For
+a list of available options head over to
 [`src/nextjs/index.ts`](src/next-edge/index.ts).
 
 ## SDK Helpers

@@ -6,12 +6,12 @@ import {
   UiNodeInputAttributes,
   UiNodeScriptAttributes,
   UiNodeTextAttributes
-} from '@ory/kratos-client'
+} from '@ory/client'
 
 /**
  * Returns the node's label.
  *
- * @param attrs
+ * @param node
  * @return label
  */
 export const getNodeLabel = (node: UiNode): string => {
@@ -106,7 +106,7 @@ export function getNodeId({ attributes }: UiNode) {
  *
  * Will always add default nodes unless `withoutDefaultGroup` is true.
  *
- * @param attrss
+ * @param nodes
  * @param groups
  * @param withoutDefaultGroup
  */
