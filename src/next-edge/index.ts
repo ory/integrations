@@ -5,8 +5,7 @@ import parse from 'set-cookie-parser'
 import { IncomingHttpHeaders } from 'http'
 import { Buffer } from 'buffer'
 import { isText } from 'istextorbinary'
-import { NextResponse } from 'next/server'
-import type { NextMiddleware } from 'next/server'
+import tldjs from 'tldjs'
 
 const forwardedHeaders = [
   'accept',
@@ -74,8 +73,18 @@ export interface CreateApiHandlerOptions {
    *
    * If you are running this app on a subdomain and you want the session and CSRF cookies
    * to be valid for the whole TLD, you can use this setting to force a cookie domain.
+   *
+   * Please be aware that his method disables the `dontUseTldForCookieDomain` option.
    */
   forceCookieDomain?: string
+
+  /**
+   * Per default the cookie will be set on the hosts top-level-domain. If the app
+   * runs on www.example.org, the cookie domain will be set automatically to example.org.
+   *
+   * Set this option to true to disable that behaviour.
+   */
+  dontUseTldForCookieDomain?: boolean
 
   /**
    * If set to true will set the "Secure" flag for all cookies. This might come in handy when you deploy
@@ -157,10 +166,18 @@ export function createApiHandler(options: CreateApiHandlerOptions) {
             options.forceCookieSecure === undefined
               ? isTls
               : options.forceCookieSecure
+
+          const forwarded = req.rawHeaders.findIndex(
+            (h) => h.toLowerCase() === 'x-forwarded-host'
+          )
+          const host =
+            forwarded > -1 ? req.rawHeaders[forwarded + 1] : req.headers.host
+          const domain = guessCookieDomain(host, options)
+
           res.headers['set-cookie'] = parse(res)
             .map((cookie) => ({
               ...cookie,
-              domain: options.forceCookieDomain,
+              domain,
               secure,
               encode
             }))
@@ -201,4 +218,29 @@ export function createApiHandler(options: CreateApiHandlerOptions) {
         })
     })
   }
+}
+
+export function guessCookieDomain(
+  url: string | undefined,
+  options: CreateApiHandlerOptions
+) {
+  if (!url || options.forceCookieDomain) {
+    return options.forceCookieDomain
+  }
+
+  if (options.dontUseTldForCookieDomain) {
+    return undefined
+  }
+
+  const parsed = tldjs.parse(url || '')
+
+  if (!parsed.isValid || parsed.isIp) {
+    return undefined
+  }
+
+  if (!parsed.domain) {
+    return parsed.hostname
+  }
+
+  return parsed.domain
 }

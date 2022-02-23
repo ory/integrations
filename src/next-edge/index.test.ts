@@ -1,4 +1,8 @@
-import { createApiHandler, CreateApiHandlerOptions } from './index'
+import {
+  createApiHandler,
+  CreateApiHandlerOptions,
+  guessCookieDomain
+} from './index'
 import express from 'express'
 import { NextApiRequest, NextApiResponse } from 'next'
 import supertest from 'supertest'
@@ -60,6 +64,7 @@ describe('NextJS handler', () => {
       .get(
         '/?paths=api&paths=kratos&paths=public&paths=self-service&paths=login&paths=browser'
       )
+      .set('Host', 'www.example.org')
       .expect(303)
       .then((res) => {
         expect(res.headers['set-cookie']).toBeDefined()
@@ -70,8 +75,31 @@ describe('NextJS handler', () => {
         ).toBeDefined()
 
         cookies.forEach(({ domain, secure }) => {
-          expect(domain).toBeUndefined()
+          expect(domain).toEqual('example.org')
           expect(secure).toBeFalsy()
+        })
+
+        done()
+      })
+      .catch(done)
+  })
+
+  test('sets the appropriate cookie domain based on headers', (done) => {
+    app = createApp({
+      apiBaseUrlOverride: 'https://playground.projects.oryapis.com'
+    })
+
+    supertest(app.app)
+      .get(
+        '/?paths=api&paths=kratos&paths=public&paths=self-service&paths=login&paths=browser'
+      )
+      .set('Host', 'www.example.org')
+      .set('X-Forwarded-Host', 'www.example.bar')
+      .expect(303)
+      .then((res) => {
+        const cookies = parse(res.headers['set-cookie'])
+        cookies.forEach(({ domain, secure }) => {
+          expect(domain).toEqual('example.bar')
         })
 
         done()
@@ -250,6 +278,76 @@ describe('NextJS handler', () => {
 
     expect(response.text).toContain(
       'action="/api/.ory/api/kratos/public/self-service/login'
+    )
+  })
+})
+
+describe('cookie guesser', () => {
+  test('uses force domain', async () => {
+    expect(
+      guessCookieDomain('https://localhost', {
+        forceCookieDomain: 'some-domain'
+      })
+    ).toEqual('some-domain')
+  })
+
+  test('does not use any guessing domain', async () => {
+    expect(
+      guessCookieDomain('https://localhost', {
+        dontUseTldForCookieDomain: true
+      })
+    ).toEqual(undefined)
+  })
+
+  test('is not confused by invalid data', async () => {
+    expect(
+      guessCookieDomain('5qw5tare4g', {
+        dontUseTldForCookieDomain: true
+      })
+    ).toEqual(undefined)
+    expect(
+      guessCookieDomain('https://123.123.123.123.123', {
+        dontUseTldForCookieDomain: true
+      })
+    ).toEqual(undefined)
+  })
+
+  test('is not confused by IP', async () => {
+    expect(
+      guessCookieDomain('https://123.123.123.123', {
+        dontUseTldForCookieDomain: true
+      })
+    ).toEqual(undefined)
+    expect(
+      guessCookieDomain('https://2001:0db8:0000:0000:0000:ff00:0042:8329', {
+        dontUseTldForCookieDomain: true
+      })
+    ).toEqual(undefined)
+  })
+
+  test('uses TLD', async () => {
+    expect(guessCookieDomain('https://foo.localhost', {})).toEqual(
+      'foo.localhost'
+    )
+
+    expect(guessCookieDomain('https://foo.localhost:1234', {})).toEqual(
+      'foo.localhost'
+    )
+
+    expect(
+      guessCookieDomain(
+        'https://spark-public.s3.amazonaws.com/dataanalysis/loansData.csv',
+        {}
+      )
+    ).toEqual('spark-public.s3.amazonaws.com')
+
+    expect(guessCookieDomain('spark-public.s3.amazonaws.com', {})).toEqual(
+      'spark-public.s3.amazonaws.com'
+    )
+
+    expect(guessCookieDomain('https://localhost/123', {})).toEqual('localhost')
+    expect(guessCookieDomain('https://localhost:1234/123', {})).toEqual(
+      'localhost'
     )
   })
 })
