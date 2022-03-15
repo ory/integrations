@@ -190,6 +190,22 @@ describe('NextJS handler', () => {
       .expect(303)
   })
 
+  test('updates the redirect location with the new schema', async () => {
+    app = createApp({
+      forceCookieSecure: false,
+      fallbackToPlayground: true
+    })
+
+    await supertest(app.app)
+      .get('/?paths=ui&paths=login')
+      .redirects(0)
+      .expect(
+        'Location',
+        '../api/self-service/login/browser?aal=&refresh=&return_to='
+      )
+      .expect(303)
+  })
+
   test('redirects home if we end up at the welcome page', async () => {
     app = createApp({
       forceCookieSecure: false,
