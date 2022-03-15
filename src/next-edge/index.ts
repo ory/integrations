@@ -156,6 +156,7 @@ export function createApiHandler(options: CreateApiHandlerOptions) {
               )
             } else if (
               res.headers.location.indexOf('/api/kratos/public/') === 0 ||
+              res.headers.location.indexOf('/self-service/') === 0 ||
               res.headers.location.indexOf('/ui/') === 0
             ) {
               res.headers.location = '/api/.ory' + res.headers.location
