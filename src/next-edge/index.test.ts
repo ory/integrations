@@ -190,9 +190,10 @@ describe('NextJS handler', () => {
       .expect(303)
   })
 
-  // TODO https://github.com/ory/integrations/issues/27
-  test.skip('updates the redirect location with the new schema', async () => {
+  test('updates the redirect location with the new schema', async () => {
     app = createApp({
+      apiBaseUrlOverride:
+        'https://fervent-jang-vww1sezlls.projects.staging.oryapis.dev',
       forceCookieSecure: false,
       fallbackToPlayground: true
     })
@@ -202,7 +203,7 @@ describe('NextJS handler', () => {
       .redirects(0)
       .expect(
         'Location',
-        '../api/self-service/login/browser?aal=&refresh=&return_to='
+        '../self-service/login/browser?aal=&refresh=&return_to='
       )
       .expect(303)
   })
