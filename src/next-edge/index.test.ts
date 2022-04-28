@@ -39,17 +39,17 @@ describe('NextJS handler', () => {
     app.server.close(done)
   })
 
-  test('returns the alive status code', (done) => {
+  test('returns the revision ID', (done) => {
     app = createApp({
       apiBaseUrlOverride: 'https://playground.projects.oryapis.com',
       forceCookieSecure: false
     })
 
     supertest(app.app)
-      .get('/?paths=api&paths=kratos&paths=public&paths=health&paths=alive')
+      .get('/?paths=revisions&paths=kratos')
       .expect(200)
       .then((res) => {
-        expect(res.body.status).toBe('ok')
+        expect(res.body).toHaveLength(36)
         done()
       })
       .catch(done)
@@ -61,9 +61,7 @@ describe('NextJS handler', () => {
     })
 
     supertest(app.app)
-      .get(
-        '/?paths=api&paths=kratos&paths=public&paths=self-service&paths=login&paths=browser'
-      )
+      .get('/?paths=self-service&paths=login&paths=browser')
       .set('Host', 'www.example.org')
       .expect(303)
       .then((res) => {
@@ -90,9 +88,7 @@ describe('NextJS handler', () => {
     })
 
     supertest(app.app)
-      .get(
-        '/?paths=api&paths=kratos&paths=public&paths=self-service&paths=login&paths=browser'
-      )
+      .get('/?paths=self-service&paths=login&paths=browser')
       .set('Host', 'www.example.org')
       .set('X-Forwarded-Host', 'www.example.bar')
       .expect(303)
@@ -113,9 +109,7 @@ describe('NextJS handler', () => {
     })
 
     supertest(app.app)
-      .get(
-        '/?paths=api&paths=kratos&paths=public&paths=self-service&paths=login&paths=browser'
-      )
+      .get('/?paths=self-service&paths=login&paths=browser')
       .set('x-forwarded-proto', 'https')
       .expect(303)
       .then((res) => {
@@ -144,7 +138,7 @@ describe('NextJS handler', () => {
     })
 
     const response = await supertest(app.app)
-      .get('/?paths=api&paths=kratos&paths=public&paths=health&paths=alive')
+      .get('/?paths=health&paths=alive')
       .expect(404)
       .then((res) => res)
 
@@ -161,17 +155,20 @@ describe('NextJS handler', () => {
     })
   })
 
-  test('returns the alive status code for the playground', async () => {
+  test('returns the alive status code for the playground', (done) => {
     app = createApp({
       forceCookieSecure: false,
       fallbackToPlayground: true
     })
 
-    const response = await supertest(app.app)
-      .get('/?paths=api&paths=kratos&paths=public&paths=health&paths=alive')
+    supertest(app.app)
+      .get('/?paths=revisions&paths=kratos')
       .expect(200)
-      .then((res) => res)
-    expect(response.body.status).toBe('ok')
+      .then((res) => {
+        expect(res.body).toHaveLength(36)
+        done()
+      })
+      .catch(done)
   })
 
   test('updates the redirect location', async () => {
@@ -185,7 +182,7 @@ describe('NextJS handler', () => {
       .redirects(0)
       .expect(
         'Location',
-        '../api/kratos/public/self-service/login/browser?aal=&refresh=&return_to='
+        '../self-service/login/browser?aal=&refresh=&return_to='
       )
       .expect(303)
   })
@@ -230,10 +227,7 @@ describe('NextJS handler', () => {
     await supertest(app.app)
       .get('/?paths=ui&paths=settings')
       .redirects(0)
-      .expect(
-        'Location',
-        '/api/.ory/api/kratos/public/self-service/login/browser'
-      )
+      .expect('Location', '/api/.ory/self-service/login/browser')
       .expect(302)
   })
 
@@ -244,15 +238,11 @@ describe('NextJS handler', () => {
     })
 
     const response = await supertest(app.app)
-      .get(
-        '/?paths=api&paths=kratos&paths=public&paths=self-service&paths=login&paths=api'
-      )
+      .get('/?paths=self-service&paths=login&paths=api')
       .expect(200)
       .then((res) => res.body)
 
-    expect(response.ui.action).toContain(
-      '/api/.ory/api/kratos/public/self-service/login?flow='
-    )
+    expect(response.ui.action).toContain('/self-service/login?flow=')
   })
 
   test('should work with binaries', async () => {
@@ -271,9 +261,7 @@ describe('NextJS handler', () => {
     })
 
     let response = await supertest(app.app)
-      .get(
-        '/?paths=api&paths=kratos&paths=public&paths=self-service&paths=login&paths=browser'
-      )
+      .get('/?paths=self-service&paths=login&paths=browser')
       .expect(303)
 
     expect(response.headers['location']).toContain('/api/.ory/ui/login')
@@ -294,9 +282,7 @@ describe('NextJS handler', () => {
       .expect('Content-Type', /text\/html/)
       .expect(200)
 
-    expect(response.text).toContain(
-      'action="/api/.ory/api/kratos/public/self-service/login'
-    )
+    expect(response.text).toContain('action="/api/.ory/self-service/login')
   })
 })
 
