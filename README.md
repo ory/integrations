@@ -23,7 +23,7 @@ To connect a NextJS app with Ory, do the following in your NextJS App:
 $ npm i --save @ory/integrations
 ```
 
-Then create a file at `<your-nextjs-app>/api/.ory/[...paths.ts]` with the
+Then create a file at `<your-nextjs-app>/api/.ory/[...paths].ts` with the
 following contents:
 
 ```typescript
