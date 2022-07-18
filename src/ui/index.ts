@@ -19,17 +19,17 @@ export const getNodeLabel = (node: UiNode): string => {
   if (isUiNodeAnchorAttributes(attributes)) {
     return attributes.title.text
   }
-
+  
   if (isUiNodeImageAttributes(attributes)) {
     return node.meta.label?.text || ''
   }
-
+  
   if (isUiNodeInputAttributes(attributes)) {
     if (attributes.label?.text) {
       return attributes.label.text
     }
   }
-
+  
   return node.meta.label?.text || ''
 }
 
@@ -102,27 +102,58 @@ export function getNodeId({ attributes }: UiNode) {
 }
 
 /**
- * Filters nodes by their groups.
+ * Filters nodes by their groups and attributes.
  *
  * Will always add default nodes unless `withoutDefaultGroup` is true.
- *
+ * Will always add default attributes unless `withoutDefaultAttributes` is true.
  * @param nodes
  * @param groups
  * @param withoutDefaultGroup
+ * @param attributes
+ * @param withoutDefaultAttributes
  */
-export const filterNodesByGroups = (
-  nodes: Array<UiNode>,
-  groups?: Array<string> | string,
-  withoutDefaultGroup?: boolean
+export const filterNodesByGroups = ({
+                                      nodes,
+                                      groups,
+                                      withoutDefaultGroup,
+                                      attributes,
+                                      withoutDefaultAttributes
+                                    }: {
+                                      nodes: Array<UiNode>,
+                                      groups?: Array<string> | string,
+                                      withoutDefaultGroup?: boolean,
+                                      attributes?: Array<string> | string,
+                                      withoutDefaultAttributes?: boolean
+                                    }
 ) => {
-  if (!groups || groups.length === 0) {
-    return nodes
-  }
-
-  const search = typeof groups === 'string' ? groups.split(',') : groups
-  if (!withoutDefaultGroup) {
-    search.push('default')
-  }
-
-  return nodes.filter(({ group }) => search.indexOf(group) > -1)
+  const search = (s: Array<string> | string) => typeof s === 'string' ? s.split(',') : s
+  
+  const getInputType = (attr: UiNodeAttributes): string =>
+    (attr && isUiNodeInputAttributes(attr)
+      ? attr.type
+      : '')
+  
+  return nodes.filter(({ group }) => {
+    if (!groups) return true
+    const g = search(groups)
+    if (!withoutDefaultGroup) {
+      g.push('default')
+    }
+    return g.indexOf(group) > -1
+  })
+    .filter(({ group, attributes: attr }) => {
+      if (!attributes) return true
+      const a = search(attributes)
+      if (!withoutDefaultAttributes) {
+        // always add hidden fields e.g. csrf
+        if (group.includes('default')) {
+          a.push('hidden')
+        }
+        // automatically add the necessary fields for webauthn and totp
+        if (group.includes('webauthn') || group.includes('totp')) {
+          a.push('input', 'script')
+        }
+      }
+      return a.indexOf(getInputType(attr)) > -1
+    })
 }
