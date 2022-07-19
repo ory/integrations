@@ -3,8 +3,8 @@ import { filterNodesByGroups, getNodeLabel } from './index'
 import nodes from './fixtures/nodes.json'
 
 type RecursivePartial<T> = {
-  [P in keyof T]?: RecursivePartial<T[P]>;
-};
+  [P in keyof T]?: RecursivePartial<T[P]>
+}
 
 describe('generic helpers', () => {
   const testNodes: Array<RecursivePartial<UiNode>> = [
@@ -52,9 +52,9 @@ describe('generic helpers', () => {
       }
     }
   ]
-  
+
   const uiNodes = testNodes as Array<UiNode>
-  
+
   const tc = [
     {
       description: 'nodes with the checkbox attribute',
@@ -74,7 +74,8 @@ describe('generic helpers', () => {
       ]
     },
     {
-      description: 'filtering by nodes should always include the default attributes',
+      description:
+        'filtering by nodes should always include the default attributes',
       opts: {
         attributes: 'email',
         withoutDefaultAttributes: false
@@ -107,7 +108,8 @@ describe('generic helpers', () => {
       ]
     },
     {
-      description: 'can filter by nodes using comma seperated groups and should always include the default groups',
+      description:
+        'can filter by nodes using comma seperated groups and should always include the default groups',
       opts: {
         groups: 'foo,bar'
       },
@@ -130,11 +132,12 @@ describe('generic helpers', () => {
             type: 'hidden',
             node_type: 'input'
           }
-        },
+        }
       ]
     },
     {
-      description: 'can filter by nodes using an array of groups and should always include the default groups',
+      description:
+        'can filter by nodes using an array of groups and should always include the default groups',
       opts: {
         groups: ['foo', 'bar']
       },
@@ -157,11 +160,12 @@ describe('generic helpers', () => {
             type: 'hidden',
             node_type: 'input'
           }
-        },
+        }
       ]
     },
     {
-      description: 'can filter by nodes using a group and exclude default groups',
+      description:
+        'can filter by nodes using a group and exclude default groups',
       opts: {
         groups: ['foo'],
         withoutDefaultGroup: true
@@ -196,20 +200,19 @@ describe('generic helpers', () => {
       ]
     }
   ]
-  
+
   tc.forEach(({ description, opts, expected }) => {
     test(description, () => {
-        expect(filterNodesByGroups({
+      expect(
+        filterNodesByGroups({
           nodes: uiNodes,
           ...opts
-        })).toEqual(expected)
-      }
-    )
+        })
+      ).toEqual(expected)
+    })
   })
-  
+
   test('getNodeLabel', () => {
     expect(nodes.map(getNodeLabel)).toMatchSnapshot()
   })
-  
 })
-

@@ -19,17 +19,17 @@ export const getNodeLabel = (node: UiNode): string => {
   if (isUiNodeAnchorAttributes(attributes)) {
     return attributes.title.text
   }
-  
+
   if (isUiNodeImageAttributes(attributes)) {
     return node.meta.label?.text || ''
   }
-  
+
   if (isUiNodeInputAttributes(attributes)) {
     if (attributes.label?.text) {
       return attributes.label.text
     }
   }
-  
+
   return node.meta.label?.text || ''
 }
 
@@ -113,34 +113,33 @@ export function getNodeId({ attributes }: UiNode) {
  * @param withoutDefaultAttributes
  */
 export const filterNodesByGroups = ({
-                                      nodes,
-                                      groups,
-                                      withoutDefaultGroup,
-                                      attributes,
-                                      withoutDefaultAttributes
-                                    }: {
-                                      nodes: Array<UiNode>,
-                                      groups?: Array<string> | string,
-                                      withoutDefaultGroup?: boolean,
-                                      attributes?: Array<string> | string,
-                                      withoutDefaultAttributes?: boolean
-                                    }
-) => {
-  const search = (s: Array<string> | string) => typeof s === 'string' ? s.split(',') : s
-  
+  nodes,
+  groups,
+  withoutDefaultGroup,
+  attributes,
+  withoutDefaultAttributes
+}: {
+  nodes: Array<UiNode>
+  groups?: Array<string> | string
+  withoutDefaultGroup?: boolean
+  attributes?: Array<string> | string
+  withoutDefaultAttributes?: boolean
+}) => {
+  const search = (s: Array<string> | string) =>
+    typeof s === 'string' ? s.split(',') : s
+
   const getInputType = (attr: UiNodeAttributes): string =>
-    (attr && isUiNodeInputAttributes(attr)
-      ? attr.type
-      : '')
-  
-  return nodes.filter(({ group }) => {
-    if (!groups) return true
-    const g = search(groups)
-    if (!withoutDefaultGroup) {
-      g.push('default')
-    }
-    return g.indexOf(group) > -1
-  })
+    attr && isUiNodeInputAttributes(attr) ? attr.type : ''
+
+  return nodes
+    .filter(({ group }) => {
+      if (!groups) return true
+      const g = search(groups)
+      if (!withoutDefaultGroup) {
+        g.push('default')
+      }
+      return g.indexOf(group) > -1
+    })
     .filter(({ group, attributes: attr }) => {
       if (!attributes) return true
       const a = search(attributes)
