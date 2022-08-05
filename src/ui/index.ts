@@ -2,11 +2,13 @@ import {
   UiNode,
   UiNodeAnchorAttributes,
   UiNodeAttributes,
+  UiNodeGroupEnum,
   UiNodeImageAttributes,
   UiNodeInputAttributes,
   UiNodeScriptAttributes,
   UiNodeTextAttributes
 } from '@ory/client'
+import { SelfServiceFlowGroup, UiNodeInputType } from './flowTypes'
 
 /**
  * Returns the node's label.
@@ -101,6 +103,18 @@ export function getNodeId({ attributes }: UiNode) {
   }
 }
 
+export const getNodeInputType = (attr: UiNodeAttributes): string =>
+  attr && isUiNodeInputAttributes(attr) ? attr.type : ''
+
+export type filterNodesByGroups = {
+  nodes: Array<UiNode>
+  groups?: Array<UiNodeGroupEnum | string> | UiNodeGroupEnum | string
+  withoutDefaultGroup?: boolean
+  attributes?: Array<UiNodeInputType | string> | UiNodeInputType | string
+  withoutDefaultAttributes?: boolean
+  excludeAttributes?: Array<UiNodeInputType | string> | UiNodeInputType | string
+}
+
 /**
  * Filters nodes by their groups and attributes.
  *
@@ -117,19 +131,11 @@ export const filterNodesByGroups = ({
   groups,
   withoutDefaultGroup,
   attributes,
-  withoutDefaultAttributes
-}: {
-  nodes: Array<UiNode>
-  groups?: Array<string> | string
-  withoutDefaultGroup?: boolean
-  attributes?: Array<string> | string
-  withoutDefaultAttributes?: boolean
-}) => {
+  withoutDefaultAttributes,
+  excludeAttributes
+}: filterNodesByGroups) => {
   const search = (s: Array<string> | string) =>
     typeof s === 'string' ? s.split(',') : s
-
-  const getInputType = (attr: UiNodeAttributes): string =>
-    attr && isUiNodeInputAttributes(attr) ? attr.type : ''
 
   return nodes
     .filter(({ group }) => {
@@ -153,6 +159,11 @@ export const filterNodesByGroups = ({
           a.push('input', 'script')
         }
       }
-      return a.indexOf(getInputType(attr)) > -1
+      return a.indexOf(getNodeInputType(attr)) > -1
+    })
+    .filter(({ attributes: attr }) => {
+      if (!excludeAttributes) return true
+      const a = search(excludeAttributes)
+      return !(a.indexOf(getNodeInputType(attr)) > -1)
     })
 }

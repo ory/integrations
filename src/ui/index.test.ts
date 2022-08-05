@@ -2,12 +2,8 @@ import { UiNode } from '@ory/client'
 import { filterNodesByGroups, getNodeLabel } from './index'
 import nodes from './fixtures/nodes.json'
 
-type RecursivePartial<T> = {
-  [P in keyof T]?: RecursivePartial<T[P]>
-}
-
 describe('generic helpers', () => {
-  const testNodes: Array<RecursivePartial<UiNode>> = [
+  const testNodes: Array<any> = [
     { group: 'default', type: 'a' },
     { group: 'foo', type: 'b' },
     { group: 'bar', type: 'c' },
@@ -55,7 +51,11 @@ describe('generic helpers', () => {
 
   const uiNodes = testNodes as Array<UiNode>
 
-  const tc = [
+  const tc: Array<{
+    description: string
+    opts: Partial<filterNodesByGroups>
+    expected: Array<any>
+  }> = [
     {
       description: 'nodes with the checkbox attribute',
       opts: {
@@ -194,6 +194,24 @@ describe('generic helpers', () => {
           attributes: {
             name: 'c',
             type: 'hidden',
+            node_type: 'input'
+          }
+        }
+      ]
+    },
+    {
+      description: 'can filter by attributes and exclude another attributes',
+      opts: {
+        groups: 'webauthn',
+        withoutDefaultGroup: true,
+        excludeAttributes: 'script'
+      },
+      expected: [
+        {
+          group: 'webauthn',
+          attributes: {
+            name: 'e',
+            type: 'input',
             node_type: 'input'
           }
         }
