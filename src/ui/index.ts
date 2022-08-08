@@ -8,7 +8,6 @@ import {
   UiNodeScriptAttributes,
   UiNodeTextAttributes
 } from '@ory/client'
-import { SelfServiceFlowGroup, UiNodeInputType } from './flowTypes'
 
 /**
  * Returns the node's label.
@@ -105,6 +104,19 @@ export function getNodeId({ attributes }: UiNode) {
 
 export const getNodeInputType = (attr: UiNodeAttributes): string =>
   attr && isUiNodeInputAttributes(attr) ? attr.type : ''
+
+// TODO remove this type once the SDK is updated and has this enum
+export type UiNodeInputType =
+  | 'button'
+  | 'submit'
+  | 'text'
+  | 'password'
+  | 'email'
+  | 'hidden'
+  | 'script'
+  | 'input'
+  | 'checkbox'
+  | 'datetime-local'
 
 export type filterNodesByGroups = {
   nodes: Array<UiNode>
