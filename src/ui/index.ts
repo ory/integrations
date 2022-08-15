@@ -6,8 +6,8 @@ import {
   UiNodeImageAttributes,
   UiNodeInputAttributes,
   UiNodeScriptAttributes,
-  UiNodeTextAttributes
-} from '@ory/client'
+  UiNodeTextAttributes,
+} from "@ory/client"
 
 /**
  * Returns the node's label.
@@ -22,7 +22,7 @@ export const getNodeLabel = (node: UiNode): string => {
   }
 
   if (isUiNodeImageAttributes(attributes)) {
-    return node.meta.label?.text || ''
+    return node.meta.label?.text || ""
   }
 
   if (isUiNodeInputAttributes(attributes)) {
@@ -31,7 +31,7 @@ export const getNodeLabel = (node: UiNode): string => {
     }
   }
 
-  return node.meta.label?.text || ''
+  return node.meta.label?.text || ""
 }
 
 /**
@@ -40,9 +40,9 @@ export const getNodeLabel = (node: UiNode): string => {
  * @param attrs
  */
 export function isUiNodeAnchorAttributes(
-  attrs: UiNodeAttributes
+  attrs: UiNodeAttributes,
 ): attrs is UiNodeAnchorAttributes {
-  return attrs.node_type === 'a'
+  return attrs.node_type === "a"
 }
 
 /**
@@ -51,9 +51,9 @@ export function isUiNodeAnchorAttributes(
  * @param attrs
  */
 export function isUiNodeImageAttributes(
-  attrs: UiNodeAttributes
+  attrs: UiNodeAttributes,
 ): attrs is UiNodeImageAttributes {
-  return attrs.node_type === 'img'
+  return attrs.node_type === "img"
 }
 
 /**
@@ -62,9 +62,9 @@ export function isUiNodeImageAttributes(
  * @param attrs
  */
 export function isUiNodeInputAttributes(
-  attrs: UiNodeAttributes
+  attrs: UiNodeAttributes,
 ): attrs is UiNodeInputAttributes {
-  return attrs.node_type === 'input'
+  return attrs.node_type === "input"
 }
 
 /**
@@ -73,9 +73,9 @@ export function isUiNodeInputAttributes(
  * @param attrs
  */
 export function isUiNodeTextAttributes(
-  attrs: UiNodeAttributes
+  attrs: UiNodeAttributes,
 ): attrs is UiNodeTextAttributes {
-  return attrs.node_type === 'text'
+  return attrs.node_type === "text"
 }
 
 /**
@@ -84,9 +84,9 @@ export function isUiNodeTextAttributes(
  * @param attrs
  */
 export function isUiNodeScriptAttributes(
-  attrs: UiNodeAttributes
+  attrs: UiNodeAttributes,
 ): attrs is UiNodeScriptAttributes {
-  return attrs.node_type === 'script'
+  return attrs.node_type === "script"
 }
 
 /**
@@ -103,20 +103,20 @@ export function getNodeId({ attributes }: UiNode) {
 }
 
 export const getNodeInputType = (attr: UiNodeAttributes): string =>
-  attr && isUiNodeInputAttributes(attr) ? attr.type : ''
+  attr ? attr.node_type : ""
 
 // TODO remove this type once the SDK is updated and has this enum
 export type UiNodeInputType =
-  | 'button'
-  | 'submit'
-  | 'text'
-  | 'password'
-  | 'email'
-  | 'hidden'
-  | 'script'
-  | 'input'
-  | 'checkbox'
-  | 'datetime-local'
+  | "button"
+  | "submit"
+  | "text"
+  | "password"
+  | "email"
+  | "hidden"
+  | "script"
+  | "input"
+  | "checkbox"
+  | "datetime-local"
 
 export type filterNodesByGroups = {
   nodes: Array<UiNode>
@@ -144,17 +144,17 @@ export const filterNodesByGroups = ({
   withoutDefaultGroup,
   attributes,
   withoutDefaultAttributes,
-  excludeAttributes
+  excludeAttributes,
 }: filterNodesByGroups) => {
   const search = (s: Array<string> | string) =>
-    typeof s === 'string' ? s.split(',') : s
+    typeof s === "string" ? s.split(",") : s
 
   return nodes
     .filter(({ group }) => {
       if (!groups) return true
       const g = search(groups)
       if (!withoutDefaultGroup) {
-        g.push('default')
+        g.push("default")
       }
       return g.indexOf(group) > -1
     })
@@ -163,12 +163,12 @@ export const filterNodesByGroups = ({
       const a = search(attributes)
       if (!withoutDefaultAttributes) {
         // always add hidden fields e.g. csrf
-        if (group.includes('default')) {
-          a.push('hidden')
+        if (group.includes("default")) {
+          a.push("hidden")
         }
         // automatically add the necessary fields for webauthn and totp
-        if (group.includes('webauthn') || group.includes('totp')) {
-          a.push('input', 'script')
+        if (group.includes("webauthn") || group.includes("totp")) {
+          a.push("input", "script")
         }
       }
       return a.indexOf(getNodeInputType(attr)) > -1
