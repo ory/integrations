@@ -1,6 +1,7 @@
 import {
   createApiHandler,
   CreateApiHandlerOptions,
+  filterRequestHeaders,
   guessCookieDomain
 } from './index'
 import express from 'express'
@@ -353,5 +354,22 @@ describe('cookie guesser', () => {
     expect(guessCookieDomain('https://localhost:1234/123', {})).toEqual(
       'localhost'
     )
+  })
+
+  test('filters request headers', async () => {
+    const headers = {
+      accept: 'application/json',
+      filtered: 'any',
+      'x-custom': 'some'
+    }
+
+    expect(filterRequestHeaders(headers)).toEqual({
+      accept: 'application/json'
+    })
+
+    expect(filterRequestHeaders(headers, ['x-custom'])).toEqual({
+      accept: 'application/json',
+      'x-custom': 'some'
+    })
   })
 })

@@ -2,24 +2,37 @@ import request from 'request'
 import { NextApiRequest, NextApiResponse } from 'next'
 import { CookieSerializeOptions, serialize } from 'cookie'
 import parse from 'set-cookie-parser'
-import { IncomingHttpHeaders } from 'http'
+import { IncomingHttpHeaders, IncomingMessage } from 'http'
 import { Buffer } from 'buffer'
 import { isText } from 'istextorbinary'
 import tldjs from 'tldjs'
 
-const forwardedHeaders = [
-  'accept',
-  'accept-charset',
-  'accept-encoding',
-  'accept-language',
-  'authorization',
-  'cache-control',
-  'content-type',
-  'cookie',
-  'host',
-  'user-agent',
-  'referer'
-]
+export function filterRequestHeaders(
+  headers: IncomingHttpHeaders,
+  forwardAdditionalHeaders?: string[]
+): IncomingHttpHeaders {
+  const defaultForwardedHeaders = [
+    'accept',
+    'accept-charset',
+    'accept-encoding',
+    'accept-language',
+    'authorization',
+    'cache-control',
+    'content-type',
+    'cookie',
+    'host',
+    'user-agent',
+    'referer'
+  ]
+
+  return Object.fromEntries(
+    Object.entries(headers).filter(
+      ([key]) =>
+        defaultForwardedHeaders.includes(key) ||
+        (forwardAdditionalHeaders ?? []).includes(key)
+    )
+  )
+}
 
 const encode = (v: string) => v
 
@@ -96,6 +109,13 @@ export interface CreateApiHandlerOptions {
    * If set to true will fallback to the playground if no other value is set for the Ory SDK URL.
    */
   fallbackToPlayground?: boolean
+
+  /*
+   * Per default headers are filtered to forward only a fixed list.
+   *
+   * If you need to forward additional headers you can use this setting to define them.
+   */
+  forwardAdditionalHeaders?: string[]
 }
 
 /**
@@ -128,10 +148,9 @@ export function createApiHandler(options: CreateApiHandlerOptions) {
       (req as unknown as { secure: boolean }).secure ||
       req.headers['x-forwarded-proto'] === 'https'
 
-    req.headers = Object.fromEntries(
-      Object.entries(req.headers).filter(([key]) =>
-        forwardedHeaders.includes(key)
-      )
+    req.headers = filterRequestHeaders(
+      req.headers,
+      options.forwardAdditionalHeaders
     )
 
     let buf = Buffer.alloc(0)
