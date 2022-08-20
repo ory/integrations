@@ -103,7 +103,7 @@ export function getNodeId({ attributes }: UiNode) {
 }
 
 export const getNodeInputType = (attr: UiNodeAttributes): string =>
-  attr ? attr.node_type : ""
+  attr && "type" in attr ? attr.type : ""
 
 // TODO remove this type once the SDK is updated and has this enum
 export type UiNodeInputType =
