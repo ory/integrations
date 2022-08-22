@@ -9,3 +9,5 @@ next
 routes
 
 .idea
+
+pnpm-lock.yaml

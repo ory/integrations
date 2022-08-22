@@ -27,7 +27,7 @@ Then create a file at `<your-nextjs-app>/api/.ory/[...paths].ts` with the
 following contents:
 
 ```typescript
-import { config, createApiHandler } from '@ory/integrations/next-edge'
+import { config, createApiHandler } from "@ory/integrations/next-edge"
 
 export { config }
 
@@ -53,7 +53,7 @@ Then create a file at `<your-vercel-app>/api/oryproxy.js` with the following
 contents:
 
 ```javascript
-import { config, createApiHandler } from '@ory/integrations/next-edge'
+import { config, createApiHandler } from "@ory/integrations/next-edge"
 
 export { config }
 
@@ -61,7 +61,7 @@ const ah = createApiHandler({
   /* ... */
 })
 const apiHandlerWrapper = (req, res) => {
-  req.query.paths = req.url.replace(/^\/api\/.ory\//, '').split('?')[0]
+  req.query.paths = req.url.replace(/^\/api\/.ory\//, "").split("?")[0]
   ah(req, res)
 }
 export default apiHandlerWrapper
@@ -91,14 +91,14 @@ import {
   isUiNodeImageAttributes,
   isUiNodeInputAttributes,
   isUiNodeScriptAttributes,
-  isUiNodeTextAttributes
+  isUiNodeTextAttributes,
   // ...
-} from '@ory/integrations/ui'
+} from "@ory/integrations/ui"
 
 // ...
 
 if (isUiNodeImageAttributes(node.attributes)) {
-  console.log('it is an image: ', node.attributes.src)
+  console.log("it is an image: ", node.attributes.src)
 }
 ```
 
