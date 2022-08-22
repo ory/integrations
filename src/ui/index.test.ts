@@ -312,6 +312,6 @@ describe("generic helpers", () => {
   })
 
   test("getNodeLabel", () => {
-    expect(nodes.map(getNodeLabel)).toMatchSnapshot()
+    expect((nodes as UiNode[]).map(getNodeLabel)).toMatchSnapshot()
   })
 })
