@@ -1,36 +1,36 @@
-import request from 'request'
-import { NextApiRequest, NextApiResponse } from 'next'
-import { CookieSerializeOptions, serialize } from 'cookie'
-import parse from 'set-cookie-parser'
-import { IncomingHttpHeaders, IncomingMessage } from 'http'
-import { Buffer } from 'buffer'
-import { isText } from 'istextorbinary'
-import tldjs from 'tldjs'
+import request from "request"
+import { NextApiRequest, NextApiResponse } from "next"
+import { CookieSerializeOptions, serialize } from "cookie"
+import parse from "set-cookie-parser"
+import { IncomingHttpHeaders, IncomingMessage } from "http"
+import { Buffer } from "buffer"
+import { isText } from "istextorbinary"
+import tldjs from "tldjs"
 
 export function filterRequestHeaders(
   headers: IncomingHttpHeaders,
-  forwardAdditionalHeaders?: string[]
+  forwardAdditionalHeaders?: string[],
 ): IncomingHttpHeaders {
   const defaultForwardedHeaders = [
-    'accept',
-    'accept-charset',
-    'accept-encoding',
-    'accept-language',
-    'authorization',
-    'cache-control',
-    'content-type',
-    'cookie',
-    'host',
-    'user-agent',
-    'referer'
+    "accept",
+    "accept-charset",
+    "accept-encoding",
+    "accept-language",
+    "authorization",
+    "cache-control",
+    "content-type",
+    "cookie",
+    "host",
+    "user-agent",
+    "referer",
   ]
 
   return Object.fromEntries(
     Object.entries(headers).filter(
       ([key]) =>
         defaultForwardedHeaders.includes(key) ||
-        (forwardAdditionalHeaders ?? []).includes(key)
-    )
+        (forwardAdditionalHeaders ?? []).includes(key),
+    ),
   )
 }
 
@@ -150,7 +150,7 @@ export function createApiHandler(options: CreateApiHandlerOptions) {
 
     req.headers = filterRequestHeaders(
       req.headers,
-      options.forwardAdditionalHeaders
+      options.forwardAdditionalHeaders,
     )
 
     let buf = Buffer.alloc(0)

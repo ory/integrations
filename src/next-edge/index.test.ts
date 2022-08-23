@@ -1,14 +1,14 @@
 import {
   createApiHandler,
   CreateApiHandlerOptions,
-  guessCookieDomain
-} from './index'
-import express from 'express'
-import { NextApiRequest, NextApiResponse } from 'next'
-import supertest from 'supertest'
-import parse from 'set-cookie-parser'
-import http from 'http'
-import { Application } from 'express-serve-static-core'
+  guessCookieDomain,
+} from "./index"
+import express from "express"
+import { NextApiRequest, NextApiResponse } from "next"
+import supertest from "supertest"
+import parse from "set-cookie-parser"
+import http from "http"
+import { Application } from "express-serve-static-core"
 
 interface AppResult {
   app: Application
@@ -340,30 +340,30 @@ describe("cookie guesser", () => {
 
     expect(
       guessCookieDomain(
-        'https://spark-public.s3.amazonaws.com/dataanalysis/loansData.csv',
-        {}
-      )
-    ).toEqual('spark-public.s3.amazonaws.com')
+        "https://spark-public.s3.amazonaws.com/dataanalysis/loansData.csv",
+        {},
+      ),
+    ).toEqual("spark-public.s3.amazonaws.com")
 
-    expect(guessCookieDomain('spark-public.s3.amazonaws.com', {})).toEqual(
-      'spark-public.s3.amazonaws.com'
+    expect(guessCookieDomain("spark-public.s3.amazonaws.com", {})).toEqual(
+      "spark-public.s3.amazonaws.com",
     )
   })
 
-  test('filters request headers', async () => {
+  test("filters request headers", async () => {
     const headers = {
-      accept: 'application/json',
-      filtered: 'any',
-      'x-custom': 'some'
+      accept: "application/json",
+      filtered: "any",
+      "x-custom": "some",
     }
 
     expect(filterRequestHeaders(headers)).toEqual({
-      accept: 'application/json'
+      accept: "application/json",
     })
 
-    expect(guessCookieDomain('https://localhost/123', {})).toEqual('localhost')
-    expect(guessCookieDomain('https://localhost:1234/123', {})).toEqual(
-      'localhost'
+    expect(guessCookieDomain("https://localhost/123", {})).toEqual("localhost")
+    expect(guessCookieDomain("https://localhost:1234/123", {})).toEqual(
+      "localhost",
     )
   })
 })
