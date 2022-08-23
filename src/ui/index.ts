@@ -102,6 +102,13 @@ export function getNodeId({ attributes }: UiNode) {
   }
 }
 
+/**
+ * Return the node input attribute type
+ * In <input> elements we have a variety of types, such as text, password, email, etc.
+ * When the attribute is null or the `type` attribute is not present, we assume it has no defined type.
+ * @param attr
+ * @returns type of node
+ */
 export const getNodeInputType = (attr: UiNodeAttributes): string =>
   attr && "type" in attr ? attr.type : ""
 
