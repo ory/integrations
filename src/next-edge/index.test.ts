@@ -1,6 +1,7 @@
 import {
   createApiHandler,
   CreateApiHandlerOptions,
+  filterRequestHeaders,
   guessCookieDomain,
 } from "./index"
 import express from "express"
@@ -348,6 +349,11 @@ describe("cookie guesser", () => {
     expect(guessCookieDomain("spark-public.s3.amazonaws.com", {})).toEqual(
       "spark-public.s3.amazonaws.com",
     )
+
+    expect(guessCookieDomain("https://localhost/123", {})).toEqual("localhost")
+    expect(guessCookieDomain("https://localhost:1234/123", {})).toEqual(
+      "localhost",
+    )
   })
 
   test("filters request headers", async () => {
@@ -361,9 +367,9 @@ describe("cookie guesser", () => {
       accept: "application/json",
     })
 
-    expect(guessCookieDomain("https://localhost/123", {})).toEqual("localhost")
-    expect(guessCookieDomain("https://localhost:1234/123", {})).toEqual(
-      "localhost",
-    )
+    expect(filterRequestHeaders(headers, ["x-custom"])).toEqual({
+      accept: "application/json",
+      "x-custom": "some",
+    })
   })
 })
