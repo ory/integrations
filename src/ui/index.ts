@@ -5,6 +5,7 @@ import {
   UiNodeGroupEnum,
   UiNodeImageAttributes,
   UiNodeInputAttributes,
+  UiNodeInputAttributesTypeEnum,
   UiNodeScriptAttributes,
   UiNodeTextAttributes,
 } from "@ory/client"
@@ -112,26 +113,19 @@ export function getNodeId({ attributes }: UiNode) {
 export const getNodeInputType = (attr: UiNodeAttributes): string =>
   attr && "type" in attr ? attr.type : ""
 
-// TODO remove this type once the SDK is updated and has this enum
-export type UiNodeInputType =
-  | "button"
-  | "submit"
-  | "text"
-  | "password"
-  | "email"
-  | "hidden"
-  | "script"
-  | "input"
-  | "checkbox"
-  | "datetime-local"
-
-export type filterNodesByGroups = {
+export type FilterNodesByGroups = {
   nodes: Array<UiNode>
   groups?: Array<UiNodeGroupEnum | string> | UiNodeGroupEnum | string
   withoutDefaultGroup?: boolean
-  attributes?: Array<UiNodeInputType | string> | UiNodeInputType | string
+  attributes?:
+    | Array<UiNodeInputAttributesTypeEnum | string>
+    | UiNodeInputAttributesTypeEnum
+    | string
   withoutDefaultAttributes?: boolean
-  excludeAttributes?: Array<UiNodeInputType | string> | UiNodeInputType | string
+  excludeAttributes?:
+    | Array<UiNodeInputAttributesTypeEnum | string>
+    | UiNodeInputAttributesTypeEnum
+    | string
 }
 
 /**
@@ -152,7 +146,7 @@ export const filterNodesByGroups = ({
   attributes,
   withoutDefaultAttributes,
   excludeAttributes,
-}: filterNodesByGroups) => {
+}: FilterNodesByGroups) => {
   const search = (s: Array<string> | string) =>
     typeof s === "string" ? s.split(",") : s
 

@@ -1,5 +1,5 @@
 import { UiNode } from "@ory/client"
-import { filterNodesByGroups, getNodeLabel } from "./index"
+import { FilterNodesByGroups, getNodeLabel } from "./index"
 import nodes from "./fixtures/nodes.json"
 
 describe("generic helpers", () => {
@@ -61,7 +61,7 @@ describe("generic helpers", () => {
 
   const tc: Array<{
     description: string
-    opts: Partial<filterNodesByGroups>
+    opts: Partial<FilterNodesByGroups>
     expected: Array<any>
   }> = [
     {
