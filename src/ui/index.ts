@@ -110,8 +110,7 @@ export function getNodeId({ attributes }: UiNode) {
  * @param attr
  * @returns type of node
  */
-export const getNodeInputType = (attr: UiNodeAttributes): string =>
-  attr && "type" in attr ? attr.type : ""
+export const getNodeInputType = (attr: any): string => attr?.["type"] ?? ""
 
 export type FilterNodesByGroups = {
   nodes: Array<UiNode>
@@ -130,14 +129,15 @@ export type FilterNodesByGroups = {
 
 /**
  * Filters nodes by their groups and attributes.
- *
+ * If no filtering options are specified, all nodes are returned.
  * Will always add default nodes unless `withoutDefaultGroup` is true.
  * Will always add default attributes unless `withoutDefaultAttributes` is true.
- * @param nodes
- * @param groups
- * @param withoutDefaultGroup
- * @param attributes
- * @param withoutDefaultAttributes
+ * @param {Object} filterNodesByGroups - An object containing the nodes and the filtering options.
+ * @param {Array<UiNode>} filterNodesByGroups.nodes - An array of nodes.
+ * @param {Array<UiNodeGroupEnum | string> | string} filterNodesByGroups.groups - An array or comma seperated strings of groups to filter by.
+ * @param {boolean} filterNodesByGroups.withoutDefaultGroup - If true, will not add default nodes under the 'default' category.
+ * @param {Array<UiNodeInputAttributesTypeEnum | string> | string} filterNodesByGroups.attributes - An array or comma seperated strings of attributes to filter by.
+ * @param {boolean} filterNodesByGroups.withoutDefaultAttributes - If true, will not add default attributes such as 'hidden' and 'script'.
  */
 export const filterNodesByGroups = ({
   nodes,
@@ -150,33 +150,39 @@ export const filterNodesByGroups = ({
   const search = (s: Array<string> | string) =>
     typeof s === "string" ? s.split(",") : s
 
-  return nodes
-    .filter(({ group }) => {
-      if (!groups) return true
-      const g = search(groups)
-      if (!withoutDefaultGroup) {
-        g.push("default")
+  return nodes.filter(({ group, attributes: attr }) => {
+    // if we have not specified any group or attribute filters, return all nodes
+    if (!groups && !attributes && !excludeAttributes) return true
+
+    const g = search(groups) || []
+    if (!withoutDefaultGroup) {
+      g.push("default")
+    }
+
+    // filter the attributes
+    const a = search(attributes) || []
+    if (!withoutDefaultAttributes) {
+      // always add hidden fields e.g. csrf
+      if (group.includes("default")) {
+        a.push("hidden")
       }
-      return g.indexOf(group) > -1
-    })
-    .filter(({ group, attributes: attr }) => {
-      if (!attributes) return true
-      const a = search(attributes)
-      if (!withoutDefaultAttributes) {
-        // always add hidden fields e.g. csrf
-        if (group.includes("default")) {
-          a.push("hidden")
-        }
-        // automatically add the necessary fields for webauthn and totp
-        if (group.includes("webauthn") || group.includes("totp")) {
-          a.push("input", "script")
-        }
+      // automatically add the necessary fields for webauthn and totp
+      if (group.includes("webauthn") || group.includes("totp")) {
+        a.push("input", "script")
       }
-      return a.indexOf(getNodeInputType(attr)) > -1
-    })
-    .filter(({ attributes: attr }) => {
-      if (!excludeAttributes) return true
-      const a = search(excludeAttributes)
-      return !(a.indexOf(getNodeInputType(attr)) > -1)
-    })
+    }
+
+    // filter the attributes to exclude
+    const ea = search(excludeAttributes) || []
+
+    const filterGroup = groups ? g.includes(group) : true
+    const filterAttributes = attributes
+      ? a.includes(getNodeInputType(attr))
+      : true
+    const filterExcludeAttributes = excludeAttributes
+      ? !ea.includes(getNodeInputType(attr))
+      : true
+
+    return filterGroup && filterAttributes && filterExcludeAttributes
+  })
 }

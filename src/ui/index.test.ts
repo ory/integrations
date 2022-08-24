@@ -240,7 +240,7 @@ describe("generic helpers", () => {
       ],
     },
     {
-      description: "can filter by attributes and exclude another attributes",
+      description: "can filter by nodes and exclude attributes",
       opts: {
         groups: "webauthn",
         withoutDefaultGroup: true,
@@ -300,15 +300,13 @@ describe("generic helpers", () => {
     },
   ]
 
-  tc.forEach(({ description, opts, expected }) => {
-    test(description, () => {
-      expect(
-        filterNodesByGroups({
-          nodes: uiNodes,
-          ...opts,
-        }),
-      ).toEqual(expected)
-    })
+  test.each(tc)("$description", ({ opts, expected }) => {
+    expect(
+      filterNodesByGroups({
+        nodes: uiNodes,
+        ...opts,
+      }),
+    ).toEqual(expected)
   })
 
   test("getNodeLabel", () => {
