@@ -1,5 +1,5 @@
 import { UiNode } from "@ory/client"
-import { FilterNodesByGroups, getNodeLabel } from "./index"
+import { filterNodesByGroups, FilterNodesByGroups, getNodeLabel } from "./index"
 import nodes from "./fixtures/nodes.json"
 
 describe("generic helpers", () => {
