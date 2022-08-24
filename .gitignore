@@ -7,3 +7,7 @@ ui
 next-edge
 next
 routes
+
+.idea
+
+pnpm-lock.yaml

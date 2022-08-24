@@ -1,5 +1,5 @@
-export const initBrowserLogin = '/self-service/login/browser'
-export const initBrowserRegistration = '/self-service/registration/browser'
-export const initBrowserRecovery = '/self-service/recovery/browser'
-export const initBrowserVerification = '/self-service/verification/browser'
-export const initBrowserSettings = '/self-service/settings/browser'
+export const initBrowserLogin = "/self-service/login/browser"
+export const initBrowserRegistration = "/self-service/registration/browser"
+export const initBrowserRecovery = "/self-service/recovery/browser"
+export const initBrowserVerification = "/self-service/verification/browser"
+export const initBrowserSettings = "/self-service/settings/browser"
