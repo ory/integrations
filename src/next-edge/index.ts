@@ -153,6 +153,10 @@ export function createApiHandler(options: CreateApiHandlerOptions) {
       options.forwardAdditionalHeaders,
     )
 
+    req.headers["X-Ory-Base-URL-Rewrite"] = "false"
+    req.headers["Ory-Base-URL-Rewrite"] = "false"
+    req.headers["Ory-No-Custom-Domain-Redirect"] = "true"
+
     let buf = Buffer.alloc(0)
     let code = 0
     let headers: IncomingHttpHeaders
