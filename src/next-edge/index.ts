@@ -79,6 +79,11 @@ export interface CreateApiHandlerOptions {
    *  https://playground.projects.oryapis.com
    */
   apiBaseUrlOverride?: string
+  
+  /**
+   * If set overrides the ui/welcome redirection.
+   */
+  appRootPath?: string
 
   /**
    * Per default, this handler will strip the cookie domain from
@@ -135,11 +140,22 @@ export function createApiHandler(options: CreateApiHandlerOptions) {
     const path = Array.isArray(paths) ? paths.join("/") : paths
     const url = `${baseUrl}/${path}?${search.toString()}`
 
-    if (path === "ui/welcome") {
+    if (path.startsWith("ui/welcome")) {
+      let pathArray = path.split("/")
+      let subPath = ''
+      if(pathArray.length > 2){
+        pathArray.splice(0,2)
+        subPath = '/' + pathArray.join('/')
+      }
+      let redirectUrl = "../../../" + subPath
+      if (appRootPath){
+        redirectUrl = appRootPath + subPath        
+        }
+      
       // A special for redirecting to the home page
       // if we were being redirected to the hosted UI
       // welcome page.
-      res.redirect(303, "../../../")
+      res.redirect(303, redirectUrl )
       return
     }
 
