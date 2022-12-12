@@ -252,7 +252,7 @@ describe("NextJS handler", () => {
       fallbackToPlayground: true,
     })
 
-    await supertest(app.app).get("/?paths=ui&paths=ory.png").expect(200)
+    await supertest(app.app).get("/?paths=ui&paths=ory-small.svg").expect(200)
   })
 
   test("updates the contents of HTML", async () => {
