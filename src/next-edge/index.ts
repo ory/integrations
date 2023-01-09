@@ -139,7 +139,7 @@ export function createApiHandler(options: CreateApiHandlerOptions) {
 
     const path = Array.isArray(paths) ? paths.join("/") : paths
     const url = `${baseUrl}/${path}?${search.toString()}`
-    const appBasePath = options.appBasePath || ''
+    const appBasePath = options.appBasePath || ""
 
     if (path === "ui/welcome") {
       // A special for redirecting to the home page
@@ -188,7 +188,8 @@ export function createApiHandler(options: CreateApiHandlerOptions) {
               res.headers.location.indexOf("/self-service/") === 0 ||
               res.headers.location.indexOf("/ui/") === 0
             ) {
-              res.headers.location = appBasePath + "/api/.ory" + res.headers.location
+              res.headers.location =
+                appBasePath + "/api/.ory" + res.headers.location
             }
           }
 
