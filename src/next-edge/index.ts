@@ -116,6 +116,11 @@ export interface CreateApiHandlerOptions {
    * If you need to forward additional headers you can use this setting to define them.
    */
   forwardAdditionalHeaders?: string[]
+
+  /*
+   * You can pass your next.config.js basePath here if your app lives on a subpath of the domain.
+   */
+  appBasePath?: string
 }
 
 /**
@@ -134,6 +139,7 @@ export function createApiHandler(options: CreateApiHandlerOptions) {
 
     const path = Array.isArray(paths) ? paths.join("/") : paths
     const url = `${baseUrl}/${path}?${search.toString()}`
+    const appBasePath = options.appBasePath || ''
 
     if (path === "ui/welcome") {
       // A special for redirecting to the home page
@@ -175,14 +181,14 @@ export function createApiHandler(options: CreateApiHandlerOptions) {
             if (res.headers.location.indexOf(baseUrl) === 0) {
               res.headers.location = res.headers.location.replace(
                 baseUrl,
-                "/api/.ory",
+                appBasePath + "/api/.ory",
               )
             } else if (
               res.headers.location.indexOf("/api/kratos/public/") === 0 ||
               res.headers.location.indexOf("/self-service/") === 0 ||
               res.headers.location.indexOf("/ui/") === 0
             ) {
-              res.headers.location = "/api/.ory" + res.headers.location
+              res.headers.location = appBasePath + "/api/.ory" + res.headers.location
             }
           }
 
@@ -230,7 +236,7 @@ export function createApiHandler(options: CreateApiHandlerOptions) {
               res.send(
                 buf
                   .toString("utf-8")
-                  .replace(new RegExp(baseUrl, "g"), "/api/.ory"),
+                  .replace(new RegExp(baseUrl, "g"), appBasePath + "/api/.ory"),
               )
             } else {
               res.write(buf)
