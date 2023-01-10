@@ -35,14 +35,14 @@
     "rollup-plugin-dts": "^4.0.0",
     "rollup-plugin-esbuild": "^4.5.0",
     "supertest": "^6.1.6",
-    "typescript": "^4.4.3"
+    "typescript": "^4.4.3",
+    "@ory/client": "^1.1.4"
   },
   "peerDependencies": {
-    "@ory/client": "^0.2.0-alpha.16",
+    "@ory/client": "^1.1.4",
     "next": ">=12.0.10"
   },
   "dependencies": {
-    "@ory/client": "^1.1.0",
     "cookie": "^0.4.1",
     "istextorbinary": "^6.0.0",
     "next": ">=12.0.10",
