@@ -33,19 +33,20 @@ const handler = async (
   request: NextRequest,
   { params }: { params: { path: string[] } },
 ) => {
-  const url = request.nextUrl
-  const flow = url.searchParams.get("flow")
-
   const path = request.nextUrl.pathname.replace("/api/.ory", "")
   const flowUrl = new URL(
     `${process.env.ORY_SDK_URL}${path}${request.nextUrl.search}`,
   )
 
-  if (!flow) {
-    NextResponse.redirect(flowUrl.toString())
-  }
+  const getBody = async () => {
+    if (request.method === "GET") {
+      return undefined;
+    }
+    const body = await request.json();
+    return body;
+  };
 
-  const body = await request.json()
+  const body = await getBody();
 
   const headers = filterRequestHeaders(request.headers)
   headers.set("X-Ory-Base-URL-Rewrite", "false")
@@ -55,11 +56,10 @@ const handler = async (
   const payload = {
     method: request.method,
     headers,
-    body: JSON.stringify(body),
+    ...(body && { body: JSON.stringify(body) }),
   }
 
   const resp = await fetch(flowUrl.toString(), payload)
-
   return resp
 }
 
