@@ -34,18 +34,18 @@ const handler = async (
   { params }: { params: { path: string[] } },
 ) => {
   const path = request.nextUrl.pathname.replace("/api/.ory", "")
-  const flowUrl = new URL(path, process.env.ORY_SDK_URL);
-  flowUrl.search = request.nextUrl.search;
+  const flowUrl = new URL(path, process.env.ORY_SDK_URL)
+  flowUrl.search = request.nextUrl.search
 
   const getBody = async () => {
     if (request.method === "GET") {
-      return undefined;
+      return undefined
     }
-    const body = await request.json();
-    return body;
-  };
+    const body = await request.json()
+    return body
+  }
 
-  const body = await getBody();
+  const body = await getBody()
 
   const headers = filterRequestHeaders(request.headers)
   headers.set("X-Ory-Base-URL-Rewrite", "false")
