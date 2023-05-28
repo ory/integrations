@@ -34,9 +34,8 @@ const handler = async (
   { params }: { params: { path: string[] } },
 ) => {
   const path = request.nextUrl.pathname.replace("/api/.ory", "")
-  const flowUrl = new URL(
-    `${process.env.ORY_SDK_URL}${path}${request.nextUrl.search}`,
-  )
+  const flowUrl = new URL(path, process.env.ORY_SDK_URL);
+  flowUrl.search = request.nextUrl.search;
 
   const getBody = async () => {
     if (request.method === "GET") {
