@@ -39,7 +39,7 @@
     "typescript": "^4.4.3"
   },
   "peerDependencies": {
-    "@ory/client": "1.1.39",
+    "@ory/client": ">=1.1.39",
     "next": ">=12.0.10"
   },
   "dependencies": {
