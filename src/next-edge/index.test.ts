@@ -8,7 +8,7 @@ import express from "express"
 import { NextApiRequest, NextApiResponse } from "next"
 import supertest from "supertest"
 import parse from "set-cookie-parser"
-import http from "http"
+import http from "node:http"
 import { Application } from "express-serve-static-core"
 
 interface AppResult {
@@ -22,7 +22,7 @@ function createApp(options: CreateApiHandlerOptions): AppResult {
   const handler = createApiHandler(options)
   const router = express.Router()
   router.use((req, res) => {
-    handler(req as any as NextApiRequest, res as any as NextApiResponse)
+    handler(req as unknown as NextApiRequest, res as unknown as NextApiResponse)
   })
 
   app.use(router)
@@ -95,7 +95,7 @@ describe("NextJS handler", () => {
       .expect(303)
       .then((res) => {
         const cookies = parse(res.headers["set-cookie"])
-        cookies.forEach(({ domain, secure }) => {
+        cookies.forEach(({ domain }) => {
           expect(domain).toEqual("example.bar")
         })
 

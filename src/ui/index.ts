@@ -110,21 +110,21 @@ export function getNodeId({ attributes }: UiNode) {
  * @param attr
  * @returns type of node
  */
-export const getNodeInputType = (attr: any): string => attr?.["type"] ?? ""
+export const getNodeInputType = (attr: UiNodeAttributes | null): string => attr && "type" in attr ? attr.type : ""
 
 export type FilterNodesByGroups = {
   nodes: Array<UiNode>
   groups?: Array<UiNodeGroupEnum | string> | UiNodeGroupEnum | string
   withoutDefaultGroup?: boolean
   attributes?:
-    | Array<UiNodeInputAttributesTypeEnum | string>
-    | UiNodeInputAttributesTypeEnum
-    | string
+  | Array<UiNodeInputAttributesTypeEnum | string>
+  | UiNodeInputAttributesTypeEnum
+  | string
   withoutDefaultAttributes?: boolean
   excludeAttributes?:
-    | Array<UiNodeInputAttributesTypeEnum | string>
-    | UiNodeInputAttributesTypeEnum
-    | string
+  | Array<UiNodeInputAttributesTypeEnum | string>
+  | UiNodeInputAttributesTypeEnum
+  | string
 }
 
 /**
@@ -147,7 +147,7 @@ export const filterNodesByGroups = ({
   withoutDefaultAttributes,
   excludeAttributes,
 }: FilterNodesByGroups) => {
-  const search = (s: Array<string> | string) =>
+  const search = (s: Array<string> | string | undefined) =>
     typeof s === "string" ? s.split(",") : s
 
   return nodes.filter(({ group, attributes: attr }) => {

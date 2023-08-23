@@ -1,16 +1,15 @@
-import request from "request"
 import { NextApiRequest, NextApiResponse } from "next"
 import { CookieSerializeOptions, serialize } from "cookie"
 import parse from "set-cookie-parser"
-import { IncomingHttpHeaders, IncomingMessage } from "http"
-import { Buffer } from "buffer"
+import { IncomingHttpHeaders } from "http"
 import { isText } from "istextorbinary"
 import tldjs from "tldjs"
+import fetch from "node-fetch"
 
 export function filterRequestHeaders(
   headers: IncomingHttpHeaders,
   forwardAdditionalHeaders?: string[],
-): IncomingHttpHeaders {
+): Headers {
   const defaultForwardedHeaders = [
     "accept",
     "accept-charset",
@@ -25,13 +24,15 @@ export function filterRequestHeaders(
     "referer",
   ]
 
-  return Object.fromEntries(
-    Object.entries(headers).filter(
-      ([key]) =>
-        defaultForwardedHeaders.includes(key) ||
-        (forwardAdditionalHeaders ?? []).includes(key),
-    ),
-  )
+  const returnHeaders = new Headers()
+
+  Object.entries(headers).forEach(([key, value]) => {
+    if (defaultForwardedHeaders.includes(key) || forwardAdditionalHeaders?.includes(key)) {
+      returnHeaders.set(key, value as string)
+    }
+  })
+
+  return returnHeaders
 }
 
 const encode = (v: string) => v
@@ -125,7 +126,7 @@ export interface CreateApiHandlerOptions {
  */
 export function createApiHandler(options: CreateApiHandlerOptions) {
   const baseUrl = getBaseUrl(options)
-  return (req: NextApiRequest, res: NextApiResponse<string>) => {
+  return async (req: NextApiRequest, res: NextApiResponse<string>) => {
     const { paths, ...query } = req.query
     const search = new URLSearchParams()
     Object.keys(query).forEach((key) => {
@@ -148,101 +149,90 @@ export function createApiHandler(options: CreateApiHandlerOptions) {
       (req as unknown as { secure: boolean }).secure ||
       req.headers["x-forwarded-proto"] === "https"
 
-    req.headers = filterRequestHeaders(
-      req.headers,
-      options.forwardAdditionalHeaders,
-    )
+    const upstreamHeaders = filterRequestHeaders(req.headers, options.forwardAdditionalHeaders)
 
-    req.headers["X-Ory-Base-URL-Rewrite"] = "false"
-    req.headers["Ory-Base-URL-Rewrite"] = "false"
-    req.headers["Ory-No-Custom-Domain-Redirect"] = "true"
+    upstreamHeaders.set("X-Ory-Base-URL-Rewrite", "false")
+    upstreamHeaders.set("Ory-Base-URL-Rewrite", "false")
+    upstreamHeaders.set("Ory-No-Custom-Domain-Redirect", "true")
 
     let buf = Buffer.alloc(0)
-    let code = 0
-    let headers: IncomingHttpHeaders
-    return new Promise<void>((resolve) => {
-      req
-        .pipe(
-          request(url, {
-            followAllRedirects: false,
-            followRedirect: false,
-            gzip: true,
-            json: false,
-          }),
-        )
-        .on("response", (res) => {
-          if (res.headers.location) {
-            if (res.headers.location.indexOf(baseUrl) === 0) {
-              res.headers.location = res.headers.location.replace(
-                baseUrl,
-                "/api/.ory",
-              )
-            } else if (
-              res.headers.location.indexOf("/api/kratos/public/") === 0 ||
-              res.headers.location.indexOf("/self-service/") === 0 ||
-              res.headers.location.indexOf("/ui/") === 0
-            ) {
-              res.headers.location = "/api/.ory" + res.headers.location
-            }
-          }
+    return new Promise<void>((resolve) =>
+      fetch(url, {
+        follow: 0,
+        redirect: "manual",
+        compress: true,
+        headers: upstreamHeaders
+      }).then(async (r) => {
+        // rewrite the response so we can pipe it back to the client
+        let location = r.headers.get("Location") || ""
+        if (location.includes(baseUrl)) {
+          location = location.replace(baseUrl, "/api/.ory")
+        } else if (
+          location.includes("/api/kratos/public/") ||
+          location.includes("/self-service/") ||
+          location.includes("/ui/")
+        ) {
+          location = "/api/.ory" + location
+        }
 
-          const secure =
-            options.forceCookieSecure === undefined
-              ? isTls
-              : options.forceCookieSecure
+        const secure =
+          options.forceCookieSecure === undefined
+            ? isTls
+            : options.forceCookieSecure
 
-          const forwarded = req.rawHeaders.findIndex(
-            (h) => h.toLowerCase() === "x-forwarded-host",
-          )
-          const host =
-            forwarded > -1 ? req.rawHeaders[forwarded + 1] : req.headers.host
-          const domain = guessCookieDomain(host, options)
+        const forwarded = r.headers.get("X-Forwarded-Host")
 
-          res.headers["set-cookie"] = parse(res)
-            .map((cookie) => ({
-              ...cookie,
-              domain,
-              secure,
-              encode,
-            }))
+        const host = forwarded || req.headers.host
+        const domain = guessCookieDomain(host, options)
+
+        r.headers.delete("transfer-encoding")
+        r.headers.delete("content-encoding")
+        r.headers.delete("content-length")
+
+        const cookies = r.headers.get("set-cookie")
+        if (cookies) {
+          res.setHeader("set-cookie", parse(cookies).map((cookie) => ({
+            ...cookie,
+            domain,
+            secure,
+            encode,
+          }))
             .map(({ value, name, ...options }) =>
               serialize(name, value, options as CookieSerializeOptions),
+            ))
+        }
+
+        r.headers.delete("set-cookie")
+
+        // map the rest of the headers
+        r.headers.forEach((v, k) => {
+          res.setHeader(k, v)
+        })
+
+        res.statusCode = r.status
+
+        const body = await r.arrayBuffer()
+        buf = Buffer.from(body)
+
+        if (buf.length > 0) {
+          if (isText(null, buf)) {
+            res.send(
+              buf
+                .toString("utf-8")
+                .replace(new RegExp(baseUrl, "g"), "/api/.ory"),
             )
-
-          headers = res.headers
-          code = res.statusCode
-        })
-        .on("data", (chunk: Buffer) => {
-          buf = Buffer.concat([buf, chunk], buf.length + chunk.length)
-        })
-        .on("end", () => {
-          delete headers["transfer-encoding"]
-          delete headers["content-encoding"]
-          delete headers["content-length"]
-
-          Object.keys(headers).forEach((key) => {
-            res.setHeader(key, headers[key])
-          })
-
-          res.status(code)
-          if (buf.length > 0) {
-            if (isText(null, buf)) {
-              res.send(
-                buf
-                  .toString("utf-8")
-                  .replace(new RegExp(baseUrl, "g"), "/api/.ory"),
-              )
-            } else {
-              res.write(buf)
-            }
+          } else {
+            res.write(buf)
           }
+        }
 
-          res.end()
-          resolve()
-        })
-    })
+        res.end()
+        resolve()
+      })
+    )
   }
 }
+
 
 export function guessCookieDomain(
   url: string | undefined,

@@ -1,14 +1,18 @@
 {
   "compilerOptions": {
+    "target": "ESNext",
     "declaration": true,
-    "target": "esnext",
-    "module": "commonjs",
+    "allowJs": false,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "strict": true,
+    "module": "ESNext",
+    "moduleResolution": "Node",
     "noImplicitAny": true,
     "outDir": "dist",
-    "esModuleInterop": true,
     "resolveJsonModule": true,
-    "rootDir": "src",
-    "typeRoots": ["node_modules/@types"]
+    "rootDir": "src"
   },
   "exclude": ["dist", "node_modules"]
 }

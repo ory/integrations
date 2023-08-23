@@ -1,69 +1,73 @@
 import { UiNode } from "@ory/client"
-import { filterNodesByGroups, FilterNodesByGroups, getNodeLabel } from "./index"
+import { filterNodesByGroups, getNodeLabel } from "./index"
 import nodes from "./fixtures/nodes.json"
 
 describe("generic helpers", () => {
-  const testNodes: Array<any> = [
-    { group: "default", type: "a" },
-    { group: "foo", type: "b" },
-    { group: "bar", type: "c" },
-    {
-      group: "default",
-      attributes: {
-        name: "a",
-        type: "checkbox",
-        node_type: "input",
+  const testNodes: Array<{
+    group: string
+    type?: string
+    attributes?: {
+      name: string
+      type: string
+      node_type: string
+    }
+  }> = [
+      { group: "default", type: "a" },
+      { group: "foo", type: "b" },
+      { group: "bar", type: "c" },
+      {
+        group: "default",
+        attributes: {
+          name: "a",
+          type: "checkbox",
+          node_type: "input",
+        },
       },
-    },
-    {
-      group: "foo",
-      attributes: {
-        name: "c",
-        type: "hidden",
-        node_type: "input",
+      {
+        group: "foo",
+        attributes: {
+          name: "c",
+          type: "hidden",
+          node_type: "input",
+        },
       },
-    },
-    {
-      group: "webauthn",
-      attributes: {
-        name: "d",
-        type: "script",
-        node_type: "input",
+      {
+        group: "webauthn",
+        attributes: {
+          name: "d",
+          type: "script",
+          node_type: "input",
+        },
       },
-    },
-    {
-      group: "webauthn",
-      attributes: {
-        name: "e",
-        type: "input",
-        node_type: "input",
+      {
+        group: "webauthn",
+        attributes: {
+          name: "e",
+          type: "input",
+          node_type: "input",
+        },
       },
-    },
-    {
-      group: "totp",
-      attributes: {
-        name: "f",
-        type: "input",
-        node_type: "input",
+      {
+        group: "totp",
+        attributes: {
+          name: "f",
+          type: "input",
+          node_type: "input",
+        },
       },
-    },
-    {
-      group: "default",
-      attributes: {
-        name: "g",
-        type: "hidden",
-        node_type: "input",
+      {
+        group: "default",
+        attributes: {
+          name: "g",
+          type: "hidden",
+          node_type: "input",
+        },
       },
-    },
-  ]
+    ]
 
   const uiNodes = testNodes as Array<UiNode>
 
-  const tc: Array<{
-    description: string
-    opts: Partial<FilterNodesByGroups>
-    expected: Array<any>
-  }> = [
+  test.each([
     {
       description: "nodes with the checkbox attribute",
       opts: {
@@ -299,8 +303,7 @@ describe("generic helpers", () => {
       ],
     },
   ]
-
-  test.each(tc)("$description", ({ opts, expected }) => {
+  )("$description", ({ opts, expected }) => {
     expect(
       filterNodesByGroups({
         nodes: uiNodes,
@@ -310,6 +313,6 @@ describe("generic helpers", () => {
   })
 
   test("getNodeLabel", () => {
-    expect((nodes as UiNode[]).map(getNodeLabel)).toMatchSnapshot()
+    expect((nodes as unknown as UiNode[]).map(getNodeLabel)).toMatchSnapshot()
   })
 })
