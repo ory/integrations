@@ -17,40 +17,46 @@
     "test": "jest --detectOpenHandles"
   },
   "devDependencies": {
-    "@babel/core": "^7.15.5",
-    "@babel/preset-env": "^7.15.6",
-    "@babel/preset-typescript": "^7.15.0",
-    "@ory/client": "^1.1.39",
-    "@types/cookie": "^0.4.1",
-    "@types/express": "^4.17.13",
-    "@types/jest": "^27.0.1",
-    "@types/node": "^12.11.5",
-    "@types/request": "^2.48.7",
-    "@types/set-cookie-parser": "^2.4.1",
-    "@types/supertest": "^2.0.11",
-    "babel-jest": "^27.2.0",
-    "esbuild": "^0.12.28",
-    "express": "^4.17.1",
-    "jest": "^27.2.0",
-    "rollup": "^2.56.3",
-    "rollup-plugin-dts": "^4.0.0",
-    "rollup-plugin-esbuild": "^4.5.0",
-    "supertest": "^6.1.6",
-    "typescript": "^4.4.3"
+    "@babel/core": "7.15.5",
+    "@babel/preset-env": "7.15.6",
+    "@babel/preset-typescript": "7.15.0",
+    "@ory/client": "1.1.51",
+    "@types/cookie": "0.5.1",
+    "@types/express": "4.17.17",
+    "@types/jest": "27.0.1",
+    "@types/node": "18.17.14",
+    "@types/request": "2.48.8",
+    "@types/set-cookie-parser": "2.4.3",
+    "@types/supertest": "2.0.11",
+    "babel-jest": "27.2.0",
+    "esbuild": "0.12.28",
+    "express": "4.18.2",
+    "jest": "27.2.0",
+    "rollup": "2.56.3",
+    "rollup-plugin-dts": "4.0.0",
+    "rollup-plugin-esbuild": "4.5.0",
+    "supertest": "6.1.6",
+    "typescript": "4.4.3",
+    "tough-cookie": "4.1.3"
   },
   "peerDependencies": {
     "@ory/client": ">1.1.38",
     "next": ">=12.0.10"
   },
   "dependencies": {
-    "@types/tldjs": "^2.3.1",
-    "cookie": "^0.4.1",
-    "istextorbinary": "^6.0.0",
+    "@types/tldjs": "2.3.1",
+    "cookie": "0.5.0",
+    "istextorbinary": "6.0.0",
     "next": ">=12.0.10",
-    "ory-prettier-styles": "^1.3.0",
-    "prettier": "^2.3.2",
-    "request": "^2.88.2",
-    "set-cookie-parser": "^2.4.8",
-    "tldjs": "^2.3.1"
+    "ory-prettier-styles": "1.3.0",
+    "prettier": "2.3.2",
+    "request": "2.88.2",
+    "set-cookie-parser": "2.6.0",
+    "tldjs": "2.3.1"
+  },
+  "overrides": {
+    "request": {
+      "tough-cookie": "$tough-cookie"
+    }
   }
 }
