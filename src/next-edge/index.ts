@@ -6,7 +6,7 @@ import { IncomingHttpHeaders } from "http"
 import { Buffer } from "buffer"
 import { isText } from "istextorbinary"
 import tldjs from "tldjs"
-import {useRouter} from "next/router";
+import { useRouter } from "next/router"
 
 export function filterRequestHeaders(
   headers: IncomingHttpHeaders,
@@ -137,9 +137,10 @@ export function createApiHandler(options: CreateApiHandlerOptions) {
 
     const path = Array.isArray(paths) ? paths.join("/") : paths
     const url = `${baseUrl}/${path}?${search.toString()}`
-    const basePathNoLeadingSlash = basePath.length > 1 ? basePath.substring(1) : ""
+    const basePathNoLeadingSlash =
+      basePath.length > 1 ? basePath.substring(1) : ""
 
-    if (path === `${[basePathNoLeadingSlash, 'ui', 'welcome'].join('/')}`) {
+    if (path === `${[basePathNoLeadingSlash, "ui", "welcome"].join("/")}`) {
       // A special for redirecting to the home page
       // if we were being redirected to the hosted UI
       // welcome page.
@@ -182,11 +183,13 @@ export function createApiHandler(options: CreateApiHandlerOptions) {
                 `${basePath}/api/.ory`,
               )
             } else if (
-              res.headers.location.indexOf(`${basePath}/api/kratos/public/`) === 0 ||
+              res.headers.location.indexOf(`${basePath}/api/kratos/public/`) ===
+                0 ||
               res.headers.location.indexOf(`${basePath}/self-service/`) === 0 ||
               res.headers.location.indexOf(`${basePath}/ui/`) === 0
             ) {
-              res.headers.location = `${basePath}/api/.ory` + res.headers.location
+              res.headers.location =
+                `${basePath}/api/.ory` + res.headers.location
             }
           }
 
