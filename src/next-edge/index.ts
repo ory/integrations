@@ -139,8 +139,12 @@ export function createApiHandler(options: CreateApiHandlerOptions) {
     const url = `${baseUrl}/${path}?${search.toString()}`
     const basePathNoLeadingSlash =
       basePath.length > 1 ? basePath.substring(1) : ""
+    const welcomeArray =
+      basePathNoLeadingSlash.length === 0
+        ? ["ui", "welcome"]
+        : [basePathNoLeadingSlash, "ui", "welcome"]
 
-    if (path === `${[basePathNoLeadingSlash, "ui", "welcome"].join("/")}`) {
+    if (path === `${welcomeArray.join("/")}`) {
       // A special for redirecting to the home page
       // if we were being redirected to the hosted UI
       // welcome page.
