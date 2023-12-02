@@ -6,7 +6,8 @@ import { IncomingHttpHeaders } from "http"
 import { Buffer } from "buffer"
 import { isText } from "istextorbinary"
 import tldjs from "tldjs"
-import { useRouter } from "next/router"
+
+import Router from "next/router"
 
 export function filterRequestHeaders(
   headers: IncomingHttpHeaders,
@@ -126,7 +127,7 @@ export interface CreateApiHandlerOptions {
  */
 export function createApiHandler(options: CreateApiHandlerOptions) {
   const baseUrl = getBaseUrl(options)
-  const router = useRouter()
+  const router = Router
   const basePath = router?.basePath
   return (req: NextApiRequest, res: NextApiResponse<string>) => {
     const { paths, ...query } = req.query
