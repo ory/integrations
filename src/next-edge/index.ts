@@ -6,9 +6,8 @@ import { IncomingHttpHeaders } from "http"
 import { Buffer } from "buffer"
 import { isText } from "istextorbinary"
 import tldjs from "tldjs"
-
-import Router from "next/router"
-
+import getConfig from "next/config"
+const { basePath } = getConfig() || { basePath: "" }
 export function filterRequestHeaders(
   headers: IncomingHttpHeaders,
   forwardAdditionalHeaders?: string[],
@@ -127,8 +126,6 @@ export interface CreateApiHandlerOptions {
  */
 export function createApiHandler(options: CreateApiHandlerOptions) {
   const baseUrl = getBaseUrl(options)
-  const router = Router
-  const basePath = router?.basePath
   return (req: NextApiRequest, res: NextApiResponse<string>) => {
     const { paths, ...query } = req.query
     const search = new URLSearchParams()
@@ -138,18 +135,12 @@ export function createApiHandler(options: CreateApiHandlerOptions) {
 
     const path = Array.isArray(paths) ? paths.join("/") : paths
     const url = `${baseUrl}/${path}?${search.toString()}`
-    const basePathNoLeadingSlash =
-      basePath.length > 1 ? basePath.substring(1) : ""
-    const welcomeArray =
-      basePathNoLeadingSlash.length === 0
-        ? ["ui", "welcome"]
-        : [basePathNoLeadingSlash, "ui", "welcome"]
 
-    if (path === `${welcomeArray.join("/")}`) {
+    if (path === "ui/welcome") {
       // A special for redirecting to the home page
       // if we were being redirected to the hosted UI
       // welcome page.
-      res.redirect(303, "../../../")
+      res.redirect(303, `../../..${basePath.startsWith("/") ? basePath : "/"}`)
       return
     }
 

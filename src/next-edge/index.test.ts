@@ -10,6 +10,14 @@ import supertest from "supertest"
 import parse from "set-cookie-parser"
 import http from "http"
 import { Application } from "express-serve-static-core"
+import getConfig from "next/config"
+
+const { basePath } = getConfig() || { basePath: process.env.BASE_PATH || "" }
+
+const pathsPrefix =
+  (basePath || "").length > 1
+    ? `paths=${basePath.startsWith("/") ? basePath.substring(1) : basePath}&`
+    : ""
 
 interface AppResult {
   app: Application
@@ -25,7 +33,7 @@ function createApp(options: CreateApiHandlerOptions): AppResult {
     handler(req as any as NextApiRequest, res as any as NextApiResponse)
   })
 
-  app.use(router)
+  app.use(basePath.length === 0 ? "/" : basePath, router)
 
   return {
     app,
@@ -47,7 +55,7 @@ describe("NextJS handler", () => {
     })
 
     supertest(app.app)
-      .get("/?paths=revisions&paths=kratos")
+      .get(`/?${pathsPrefix}paths=revisions&paths=kratos`)
       .expect(200)
       .then((res) => {
         expect(res.body).toHaveLength(36)
@@ -62,7 +70,7 @@ describe("NextJS handler", () => {
     })
 
     supertest(app.app)
-      .get("/?paths=self-service&paths=login&paths=browser")
+      .get(`/?${pathsPrefix}paths=self-service&paths=login&paths=browser`)
       .set("Host", "www.example.org")
       .expect(303)
       .then((res) => {
@@ -89,13 +97,13 @@ describe("NextJS handler", () => {
     })
 
     supertest(app.app)
-      .get("/?paths=self-service&paths=login&paths=browser")
+      .get(`/?${pathsPrefix}paths=self-service&paths=login&paths=browser`)
       .set("Host", "www.example.org")
       .set("X-Forwarded-Host", "www.example.bar")
       .expect(303)
       .then((res) => {
         const cookies = parse(res.headers["set-cookie"])
-        cookies.forEach(({ domain, secure }) => {
+        cookies.forEach(({ domain }) => {
           expect(domain).toEqual("example.bar")
         })
 
@@ -110,7 +118,7 @@ describe("NextJS handler", () => {
     })
 
     supertest(app.app)
-      .get("/?paths=self-service&paths=login&paths=browser")
+      .get(`/?${pathsPrefix}paths=self-service&paths=login&paths=browser`)
       .set("x-forwarded-proto", "https")
       .expect(303)
       .then((res) => {
@@ -139,7 +147,7 @@ describe("NextJS handler", () => {
     })
 
     const response = await supertest(app.app)
-      .get("/?paths=health&paths=alive")
+      .get(`/?${pathsPrefix}paths=health&paths=alive`)
       .expect(404)
       .then((res) => res)
 
@@ -163,7 +171,7 @@ describe("NextJS handler", () => {
     })
 
     supertest(app.app)
-      .get("/?paths=revisions&paths=kratos")
+      .get(`/?${pathsPrefix}paths=revisions&paths=kratos`)
       .expect(200)
       .then((res) => {
         expect(res.body).toHaveLength(36)
@@ -177,13 +185,12 @@ describe("NextJS handler", () => {
       forceCookieSecure: false,
       fallbackToPlayground: true,
     })
-
     await supertest(app.app)
-      .get("/?paths=ui&paths=login")
+      .get(`/?paths=ui&paths=login`)
       .redirects(0)
       .expect(
         "Location",
-        "../self-service/login/browser?aal=&refresh=&return_to=",
+        "../self-service/login/browser?aal=&refresh=&return_to=&organization=",
       )
       .expect(303)
   })
@@ -197,11 +204,11 @@ describe("NextJS handler", () => {
     })
 
     await supertest(app.app)
-      .get("/?paths=ui&paths=login")
+      .get(`/?${pathsPrefix}paths=ui&paths=login`)
       .redirects(0)
       .expect(
         "Location",
-        "../self-service/login/browser?aal=&refresh=&return_to=",
+        "../self-service/login/browser?aal=&refresh=&return_to=&organization=",
       )
       .expect(303)
   })
@@ -213,9 +220,9 @@ describe("NextJS handler", () => {
     })
 
     await supertest(app.app)
-      .get("/?paths=ui&paths=welcome")
+      .get(`/?${pathsPrefix}paths=ui&paths=welcome`)
       .redirects(0)
-      .expect("Location", "../../../")
+      .expect("Location", `../../../${basePath}`)
       .expect(303)
   })
 
@@ -226,7 +233,7 @@ describe("NextJS handler", () => {
     })
 
     await supertest(app.app)
-      .get("/?paths=ui&paths=settings")
+      .get(`/?${pathsPrefix}paths=ui&paths=settings`)
       .redirects(0)
       .expect("Location", "/api/.ory/self-service/login/browser")
       .expect(302)
@@ -239,7 +246,7 @@ describe("NextJS handler", () => {
     })
 
     const response = await supertest(app.app)
-      .get("/?paths=self-service&paths=login&paths=api")
+      .get(`/?${pathsPrefix}paths=self-service&paths=login&paths=api`)
       .expect(200)
       .then((res) => res.body)
 
@@ -252,7 +259,9 @@ describe("NextJS handler", () => {
       fallbackToPlayground: true,
     })
 
-    await supertest(app.app).get("/?paths=ui&paths=ory-small.svg").expect(200)
+    await supertest(app.app)
+      .get(`/?${pathsPrefix}paths=ui&paths=ory-small.svg`)
+      .expect(200)
   })
 
   test("updates the contents of HTML", async () => {
@@ -262,7 +271,7 @@ describe("NextJS handler", () => {
     })
 
     let response = await supertest(app.app)
-      .get("/?paths=self-service&paths=login&paths=browser")
+      .get(`/?${pathsPrefix}paths=self-service&paths=login&paths=browser`)
       .expect(303)
 
     expect(response.headers["location"]).toContain("/api/.ory/ui/login")
