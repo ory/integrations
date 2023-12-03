@@ -6,7 +6,8 @@ import { IncomingHttpHeaders } from "http"
 import { Buffer } from "buffer"
 import { isText } from "istextorbinary"
 import tldjs from "tldjs"
-
+import getConfig from "next/config"
+const { basePath } = getConfig() || { basePath: "" }
 export function filterRequestHeaders(
   headers: IncomingHttpHeaders,
   forwardAdditionalHeaders?: string[],
@@ -139,7 +140,7 @@ export function createApiHandler(options: CreateApiHandlerOptions) {
       // A special for redirecting to the home page
       // if we were being redirected to the hosted UI
       // welcome page.
-      res.redirect(303, "../../../")
+      res.redirect(303, `../../..${basePath.startsWith("/") ? basePath : "/"}`)
       return
     }
 
@@ -175,14 +176,16 @@ export function createApiHandler(options: CreateApiHandlerOptions) {
             if (res.headers.location.indexOf(baseUrl) === 0) {
               res.headers.location = res.headers.location.replace(
                 baseUrl,
-                "/api/.ory",
+                `${basePath}/api/.ory`,
               )
             } else if (
-              res.headers.location.indexOf("/api/kratos/public/") === 0 ||
-              res.headers.location.indexOf("/self-service/") === 0 ||
-              res.headers.location.indexOf("/ui/") === 0
+              res.headers.location.indexOf(`${basePath}/api/kratos/public/`) ===
+                0 ||
+              res.headers.location.indexOf(`${basePath}/self-service/`) === 0 ||
+              res.headers.location.indexOf(`${basePath}/ui/`) === 0
             ) {
-              res.headers.location = "/api/.ory" + res.headers.location
+              res.headers.location =
+                `${basePath}/api/.ory` + res.headers.location
             }
           }
 
@@ -230,7 +233,7 @@ export function createApiHandler(options: CreateApiHandlerOptions) {
               res.send(
                 buf
                   .toString("utf-8")
-                  .replace(new RegExp(baseUrl, "g"), "/api/.ory"),
+                  .replace(new RegExp(baseUrl, "g"), `${basePath}/api/.ory`),
               )
             } else {
               res.write(buf)
