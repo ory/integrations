@@ -1,11 +1,11 @@
+import type { CreateApiHandlerOptions } from "./index"
 import {
   createApiHandler,
-  CreateApiHandlerOptions,
   filterRequestHeaders,
   guessCookieDomain,
 } from "./index"
 import express from "express"
-import { NextApiRequest, NextApiResponse } from "next"
+import type { NextApiRequest, NextApiResponse } from "next"
 import supertest from "supertest"
 import parse from "set-cookie-parser"
 import http from "http"
