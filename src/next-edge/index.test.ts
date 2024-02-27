@@ -1,15 +1,15 @@
 import {
   createApiHandler,
-  CreateApiHandlerOptions,
   filterRequestHeaders,
   guessCookieDomain,
 } from "./index"
 import express from "express"
 import { NextApiRequest, NextApiResponse } from "next"
 import supertest from "supertest"
-import parse from "set-cookie-parser"
+import parse, { splitCookiesString } from "set-cookie-parser"
 import http from "http"
 import { Application } from "express-serve-static-core"
+import { CreateApiHandlerOptions } from "../type/create-api-handler-options"
 
 interface AppResult {
   app: Application
@@ -94,7 +94,7 @@ describe("NextJS handler", () => {
       .set("X-Forwarded-Host", "www.example.bar")
       .expect(303)
       .then((res) => {
-        const cookies = parse(res.headers["set-cookie"])
+        const cookies = parse(splitCookiesString(res.headers["set-cookie"]))
         cookies.forEach(({ domain, secure }) => {
           expect(domain).toEqual("example.bar")
         })
@@ -183,7 +183,7 @@ describe("NextJS handler", () => {
       .redirects(0)
       .expect(
         "Location",
-        "../self-service/login/browser?aal=&refresh=&return_to=",
+        "../self-service/login/browser?aal=&refresh=&return_to=&organization=&via=",
       )
       .expect(303)
   })
@@ -201,7 +201,7 @@ describe("NextJS handler", () => {
       .redirects(0)
       .expect(
         "Location",
-        "../self-service/login/browser?aal=&refresh=&return_to=",
+        "../self-service/login/browser?aal=&refresh=&return_to=&organization=&via=",
       )
       .expect(303)
   })
@@ -275,11 +275,7 @@ describe("NextJS handler", () => {
 
     response = await supertest(app.app)
       .get("/?" + loc)
-      .set("Cookie", [
-        response.headers["set-cookie"]
-          .map((c: string) => c.split(";")[0])
-          .join(";"),
-      ])
+      .set("Cookie", [splitCookiesString(response.headers["set-cookie"])[0]])
       .expect("Content-Type", /text\/html/)
       .expect(200)
 
@@ -363,13 +359,10 @@ describe("cookie guesser", () => {
       "x-custom": "some",
     }
 
-    expect(filterRequestHeaders(headers)).toEqual({
-      accept: "application/json",
-    })
+    expect(filterRequestHeaders(headers).get('accept')).toEqual("application/json")
 
-    expect(filterRequestHeaders(headers, ["x-custom"])).toEqual({
-      accept: "application/json",
-      "x-custom": "some",
-    })
+    const customHeader = filterRequestHeaders(headers, ["x-custom"])
+    expect(customHeader.get('accept')).toEqual("application/json")
+    expect(customHeader.get('x-custom')).toEqual("some")
   })
 })

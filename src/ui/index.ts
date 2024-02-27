@@ -1,4 +1,4 @@
-import {
+import type {
   UiNode,
   UiNodeAnchorAttributes,
   UiNodeAttributes,
@@ -42,7 +42,7 @@ export const getNodeLabel = (node: UiNode): string => {
  */
 export function isUiNodeAnchorAttributes(
   attrs: UiNodeAttributes,
-): attrs is UiNodeAnchorAttributes {
+): attrs is UiNodeAnchorAttributes & { node_type: "a" } {
   return attrs.node_type === "a"
 }
 
@@ -53,7 +53,7 @@ export function isUiNodeAnchorAttributes(
  */
 export function isUiNodeImageAttributes(
   attrs: UiNodeAttributes,
-): attrs is UiNodeImageAttributes {
+): attrs is UiNodeImageAttributes & { node_type: "img" } {
   return attrs.node_type === "img"
 }
 
@@ -64,7 +64,7 @@ export function isUiNodeImageAttributes(
  */
 export function isUiNodeInputAttributes(
   attrs: UiNodeAttributes,
-): attrs is UiNodeInputAttributes {
+): attrs is UiNodeInputAttributes & { node_type: "input" } {
   return attrs.node_type === "input"
 }
 
@@ -75,7 +75,7 @@ export function isUiNodeInputAttributes(
  */
 export function isUiNodeTextAttributes(
   attrs: UiNodeAttributes,
-): attrs is UiNodeTextAttributes {
+): attrs is UiNodeTextAttributes & { node_type: "text" } {
   return attrs.node_type === "text"
 }
 
@@ -86,7 +86,7 @@ export function isUiNodeTextAttributes(
  */
 export function isUiNodeScriptAttributes(
   attrs: UiNodeAttributes,
-): attrs is UiNodeScriptAttributes {
+): attrs is UiNodeScriptAttributes & { node_type: "script" } {
   return attrs.node_type === "script"
 }
 
