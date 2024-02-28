@@ -3,27 +3,15 @@ import { headers } from "next/headers"
 import { redirect } from "next/navigation"
 import { NextResponse, type NextRequest } from "next/server"
 import parse, { splitCookiesString } from "set-cookie-parser"
-import tldjs from "tldjs"
-import { getBaseUrl } from "../utils/get-base-url"
+import { getBaseUrl } from "../common/get-base-url"
 import { CreateApiHandlerOptions } from "../type/create-api-handler-options"
+import { defaultForwardedHeaders } from "../common/default-forwarded-headers"
+import { processLocationHeader } from "../common/process-location-header"
+import { guessCookieDomain } from "../../next-edge"
 
 export function filterRequestHeaders(
   forwardAdditionalHeaders?: string[],
 ): Headers {
-  const defaultForwardedHeaders = [
-    "accept",
-    "accept-charset",
-    "accept-encoding",
-    "accept-language",
-    "authorization",
-    "cache-control",
-    "content-type",
-    "cookie",
-    "host",
-    "user-agent",
-    "referer",
-  ]
-
   const filteredHeaders = new Headers()
   headers().forEach((value, key) => {
     const isValid =
@@ -33,24 +21,6 @@ export function filterRequestHeaders(
   })
 
   return filteredHeaders
-}
-
-const encode = (v: string) => v
-
-function processLocationHeader(locationHeaderValue: string, baseUrl: string) {
-  if (locationHeaderValue.startsWith(baseUrl)) {
-    return locationHeaderValue.replace(baseUrl, "/api/.ory")
-  }
-
-  if (
-    locationHeaderValue.startsWith("/api/kratos/public/") ||
-    locationHeaderValue.startsWith("/self-service/") ||
-    locationHeaderValue.startsWith("/ui/")
-  ) {
-    return "/api/.ory" + locationHeaderValue
-  }
-
-  return locationHeaderValue
 }
 
 function processSetCookieHeader(
@@ -76,7 +46,7 @@ function processSetCookieHeader(
       ...cookie,
       domain,
       secure,
-      encode,
+      encode: (v: string) => v,
     }))
     .map(({ value, name, ...options }) =>
       serialize(name, value, options as CookieSerializeOptions),
@@ -175,36 +145,10 @@ export function createApiHandler(options: CreateApiHandlerOptions) {
       })
       throw error
     }
-    throw new Error("Failed to process request")
   }
 
   return {
     GET: handler,
     POST: handler,
   }
-}
-
-function guessCookieDomain(
-  url: string | undefined,
-  options: CreateApiHandlerOptions,
-) {
-  if (!url || options.forceCookieDomain) {
-    return options.forceCookieDomain
-  }
-
-  if (options.dontUseTldForCookieDomain) {
-    return undefined
-  }
-
-  const parsed = tldjs.parse(url || "")
-
-  if (!parsed.isValid || parsed.isIp) {
-    return undefined
-  }
-
-  if (!parsed.domain) {
-    return parsed.hostname
-  }
-
-  return parsed.domain
 }
