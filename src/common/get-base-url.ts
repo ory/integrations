@@ -24,4 +24,3 @@ export function getBaseUrl(options: CreateApiHandlerOptions) {
   return baseUrl.replace(/\/$/, "")
 }
 export { CreateApiHandlerOptions }
-

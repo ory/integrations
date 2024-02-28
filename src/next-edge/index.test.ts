@@ -1,7 +1,4 @@
-import {
-  createApiHandler,
-  filterRequestHeaders,
-} from "./index"
+import { createApiHandler, filterRequestHeaders } from "./index"
 import express from "express"
 import { NextApiRequest, NextApiResponse } from "next"
 import supertest from "supertest"
@@ -290,10 +287,12 @@ describe("filterRequestHeaders", () => {
       "x-custom": "some",
     }
 
-    expect(filterRequestHeaders(headers).get('accept')).toEqual("application/json")
+    expect(filterRequestHeaders(headers).get("accept")).toEqual(
+      "application/json",
+    )
 
     const customHeader = filterRequestHeaders(headers, ["x-custom"])
-    expect(customHeader.get('accept')).toEqual("application/json")
-    expect(customHeader.get('x-custom')).toEqual("some")
+    expect(customHeader.get("accept")).toEqual("application/json")
+    expect(customHeader.get("x-custom")).toEqual("some")
   })
 })
