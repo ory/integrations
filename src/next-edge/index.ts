@@ -79,13 +79,16 @@ export function createApiHandler(options: CreateApiHandlerOptions) {
   const baseUrl = getBaseUrl(options)
   return async (req: NextApiRequest, res: NextApiResponse<string>) => {
     const { paths, ...query } = req.query
-    const search = new URLSearchParams()
+
+    const searchParams = new URLSearchParams()
     Object.keys(query).forEach((key) => {
-      search.set(key, String(query[key]))
+      searchParams.set(key, String(query[key]))
     })
 
     const path = Array.isArray(paths) ? paths.join("/") : paths
-    const url = `${baseUrl}/${path}?${search.toString()}`
+
+    const url = new URL(path, baseUrl)
+    url.search = searchParams.toString()
 
     if (path === "ui/welcome") {
       // A special for redirecting to the home page

@@ -80,7 +80,7 @@ export function createApiHandler(options: CreateApiHandlerOptions) {
     requestHeaders.set("Ory-No-Custom-Domain-Redirect", "true")
 
     try {
-      const response = await fetch(url.toString(), {
+      const response = await fetch(url, {
         method: request.method,
         headers: requestHeaders,
         body:
