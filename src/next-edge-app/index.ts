@@ -7,7 +7,7 @@ import { getBaseUrl } from "../common/get-base-url"
 import { CreateApiHandlerOptions } from "../type/create-api-handler-options"
 import { defaultForwardedHeaders } from "../common/default-forwarded-headers"
 import { processLocationHeader } from "../common/process-location-header"
-import { guessCookieDomain } from "../../next-edge"
+import { guessCookieDomain } from "../common/get-cookie-domain"
 
 export function filterRequestHeaders(
   forwardAdditionalHeaders?: string[],
