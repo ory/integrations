@@ -1,4 +1,4 @@
-import { CreateApiHandlerOptions } from "../type/create-api-handler-options"
+import { type CreateApiHandlerOptions } from "../type/create-api-handler-options"
 
 export function getBaseUrl(options: CreateApiHandlerOptions) {
   let baseUrl = options.fallbackToPlayground
