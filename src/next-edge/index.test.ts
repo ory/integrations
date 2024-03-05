@@ -91,7 +91,7 @@ describe("NextJS handler", () => {
       .expect(303)
       .then((res) => {
         const cookies = parse(splitCookiesString(res.headers["set-cookie"]))
-        cookies.forEach(({ domain, secure }) => {
+        cookies.forEach(({ domain }) => {
           expect(domain).toEqual("example.bar")
         })
 

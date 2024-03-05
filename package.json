@@ -14,7 +14,7 @@
     "format:check": "prettier --check ${npm_package_config_prettierTarget}",
     "build": "rm -rf dist ui nextjs && rollup -c",
     "prepublishOnly": "npm run build",
-    "test": "jest --detectOpenHandles"
+    "test": "jest --forceExit"
   },
   "devDependencies": {
     "@babel/core": "7.23.9",
