@@ -1,15 +1,11 @@
-import {
-  createApiHandler,
-  CreateApiHandlerOptions,
-  filterRequestHeaders,
-  guessCookieDomain,
-} from "./index"
+import { createApiHandler, filterRequestHeaders } from "./index"
 import express from "express"
 import { NextApiRequest, NextApiResponse } from "next"
 import supertest from "supertest"
-import parse from "set-cookie-parser"
+import parse, { splitCookiesString } from "set-cookie-parser"
 import http from "http"
 import { Application } from "express-serve-static-core"
+import { CreateApiHandlerOptions } from "../type/create-api-handler-options"
 
 interface AppResult {
   app: Application
@@ -94,8 +90,8 @@ describe("NextJS handler", () => {
       .set("X-Forwarded-Host", "www.example.bar")
       .expect(303)
       .then((res) => {
-        const cookies = parse(res.headers["set-cookie"])
-        cookies.forEach(({ domain, secure }) => {
+        const cookies = parse(splitCookiesString(res.headers["set-cookie"]))
+        cookies.forEach(({ domain }) => {
           expect(domain).toEqual("example.bar")
         })
 
@@ -183,7 +179,7 @@ describe("NextJS handler", () => {
       .redirects(0)
       .expect(
         "Location",
-        "../self-service/login/browser?aal=&refresh=&return_to=",
+        "../self-service/login/browser?aal=&refresh=&return_to=&organization=&via=",
       )
       .expect(303)
   })
@@ -201,7 +197,7 @@ describe("NextJS handler", () => {
       .redirects(0)
       .expect(
         "Location",
-        "../self-service/login/browser?aal=&refresh=&return_to=",
+        "../self-service/login/browser?aal=&refresh=&return_to=&organization=&via=",
       )
       .expect(303)
   })
@@ -275,11 +271,7 @@ describe("NextJS handler", () => {
 
     response = await supertest(app.app)
       .get("/?" + loc)
-      .set("Cookie", [
-        response.headers["set-cookie"]
-          .map((c: string) => c.split(";")[0])
-          .join(";"),
-      ])
+      .set("Cookie", [splitCookiesString(response.headers["set-cookie"])[0]])
       .expect("Content-Type", /text\/html/)
       .expect(200)
 
@@ -287,89 +279,20 @@ describe("NextJS handler", () => {
   })
 })
 
-describe("cookie guesser", () => {
-  test("uses force domain", async () => {
-    expect(
-      guessCookieDomain("https://localhost", {
-        forceCookieDomain: "some-domain",
-      }),
-    ).toEqual("some-domain")
-  })
-
-  test("does not use any guessing domain", async () => {
-    expect(
-      guessCookieDomain("https://localhost", {
-        dontUseTldForCookieDomain: true,
-      }),
-    ).toEqual(undefined)
-  })
-
-  test("is not confused by invalid data", async () => {
-    expect(
-      guessCookieDomain("5qw5tare4g", {
-        dontUseTldForCookieDomain: true,
-      }),
-    ).toEqual(undefined)
-    expect(
-      guessCookieDomain("https://123.123.123.123.123", {
-        dontUseTldForCookieDomain: true,
-      }),
-    ).toEqual(undefined)
-  })
-
-  test("is not confused by IP", async () => {
-    expect(
-      guessCookieDomain("https://123.123.123.123", {
-        dontUseTldForCookieDomain: true,
-      }),
-    ).toEqual(undefined)
-    expect(
-      guessCookieDomain("https://2001:0db8:0000:0000:0000:ff00:0042:8329", {
-        dontUseTldForCookieDomain: true,
-      }),
-    ).toEqual(undefined)
-  })
-
-  test("uses TLD", async () => {
-    expect(guessCookieDomain("https://foo.localhost", {})).toEqual(
-      "foo.localhost",
-    )
-
-    expect(guessCookieDomain("https://foo.localhost:1234", {})).toEqual(
-      "foo.localhost",
-    )
-
-    expect(
-      guessCookieDomain(
-        "https://spark-public.s3.amazonaws.com/dataanalysis/loansData.csv",
-        {},
-      ),
-    ).toEqual("spark-public.s3.amazonaws.com")
-
-    expect(guessCookieDomain("spark-public.s3.amazonaws.com", {})).toEqual(
-      "spark-public.s3.amazonaws.com",
-    )
-
-    expect(guessCookieDomain("https://localhost/123", {})).toEqual("localhost")
-    expect(guessCookieDomain("https://localhost:1234/123", {})).toEqual(
-      "localhost",
-    )
-  })
-
-  test("filters request headers", async () => {
+describe("filterRequestHeaders", () => {
+  test("correctly filters headers", async () => {
     const headers = {
       accept: "application/json",
       filtered: "any",
       "x-custom": "some",
     }
 
-    expect(filterRequestHeaders(headers)).toEqual({
-      accept: "application/json",
-    })
+    expect(filterRequestHeaders(headers).get("accept")).toEqual(
+      "application/json",
+    )
 
-    expect(filterRequestHeaders(headers, ["x-custom"])).toEqual({
-      accept: "application/json",
-      "x-custom": "some",
-    })
+    const customHeader = filterRequestHeaders(headers, ["x-custom"])
+    expect(customHeader.get("accept")).toEqual("application/json")
+    expect(customHeader.get("x-custom")).toEqual("some")
   })
 })

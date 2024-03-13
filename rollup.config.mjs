@@ -6,7 +6,7 @@ const bundle = (config) => ({
   external: (id) => !/^[./]/.test(id),
 })
 
-const modules = ["ui", "routes", "next-edge", "next"]
+const modules = ["ui", "routes", "next-edge", "next", "next-edge-app"]
   .map((module) => [
     bundle({
       plugins: [esbuild()],
