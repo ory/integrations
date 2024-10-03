@@ -112,7 +112,9 @@ export function createApiHandler(options: CreateApiHandlerOptions) {
       headers,
       body:
         req.method !== "GET" && req.method !== "HEAD"
-          ? JSON.stringify(req.body)
+          ? headers.get("content-type").includes("json")
+            ? JSON.stringify(req.body)
+            : new URLSearchParams(req.body)
           : null,
       redirect: "manual",
     })
