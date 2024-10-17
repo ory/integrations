@@ -1,5 +1,5 @@
 import { Buffer } from "buffer"
-import { CookieSerializeOptions, serialize } from "cookie"
+import { SerializeOptions as CookieSerializeOptions, serialize } from "cookie"
 import { IncomingHttpHeaders } from "http"
 import { isText } from "istextorbinary"
 import { NextApiRequest, NextApiResponse } from "next"
