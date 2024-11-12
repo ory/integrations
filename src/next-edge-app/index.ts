@@ -1,4 +1,4 @@
-import { CookieSerializeOptions, serialize } from "cookie"
+import { SerializeOptions as CookieSerializeOptions, serialize } from "cookie"
 import { headers } from "next/headers"
 import { redirect } from "next/navigation"
 import { NextResponse, type NextRequest } from "next/server"
