@@ -1,4 +1,3 @@
-import { Buffer } from "buffer"
 import { SerializeOptions as CookieSerializeOptions, serialize } from "cookie"
 import { IncomingHttpHeaders } from "http"
 import { isText } from "istextorbinary"
@@ -9,6 +8,15 @@ import { getBaseUrl } from "../common/get-base-url"
 import { defaultForwardedHeaders } from "../common/default-forwarded-headers"
 import { processLocationHeader } from "../common/process-location-header"
 import { guessCookieDomain } from "../common/get-cookie-domain"
+
+function readRawBody(req: NextApiRequest): Promise<Buffer> {
+  return new Promise((resolve, reject) => {
+    const chunks: Uint8Array[] = []
+    req.on("data", (chunk) => chunks.push(chunk))
+    req.on("end", () => resolve(Buffer.concat(chunks)))
+    req.on("error", (err) => reject(err))
+  })
+}
 
 export function filterRequestHeaders(
   headers: IncomingHttpHeaders,
@@ -112,7 +120,7 @@ export function createApiHandler(options: CreateApiHandlerOptions) {
       headers,
       body:
         req.method !== "GET" && req.method !== "HEAD"
-          ? JSON.stringify(req.body)
+          ? await readRawBody(req)
           : null,
       redirect: "manual",
     })
