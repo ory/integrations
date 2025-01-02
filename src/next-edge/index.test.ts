@@ -17,7 +17,7 @@ function createApp(options: CreateApiHandlerOptions): AppResult {
 
   const handler = createApiHandler({
     apiBaseUrlOverride:
-        "https://youthful-feynman-ml50dfb20g.projects.staging.oryapis.dev",
+      "https://youthful-feynman-ml50dfb20g.projects.staging.oryapis.dev",
     ...options,
   })
   const router = express.Router()
