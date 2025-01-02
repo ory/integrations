@@ -15,7 +15,11 @@ interface AppResult {
 function createApp(options: CreateApiHandlerOptions): AppResult {
   const app = express()
 
-  const handler = createApiHandler(options)
+  const handler = createApiHandler({
+    apiBaseUrlOverride:
+        "https://youthful-feynman-ml50dfb20g.projects.staging.oryapis.dev",
+    ...options,
+  })
   const router = express.Router()
   router.use((req, res) => {
     handler(req as any as NextApiRequest, res as any as NextApiResponse)
