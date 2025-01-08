@@ -79,6 +79,17 @@ export function createApiHandler(options: CreateApiHandlerOptions) {
     requestHeaders.set("Ory-Base-URL-Rewrite", "false")
     requestHeaders.set("Ory-No-Custom-Domain-Redirect", "true")
 
+    // Only effective in CI.
+    if (
+      process.env.ORY_CI_RATE_LIMIT_HEADER &&
+      process.env.ORY_CI_RATE_LIMIT_HEADER_VALUE
+    ) {
+      requestHeaders.set(
+        process.env.ORY_CI_RATE_LIMIT_HEADER,
+        process.env.ORY_CI_RATE_LIMIT_HEADER_VALUE,
+      )
+    }
+
     try {
       const response = await fetch(url, {
         method: request.method,

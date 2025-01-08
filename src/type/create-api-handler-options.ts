@@ -39,7 +39,7 @@ export interface CreateApiHandlerOptions {
    */
   fallbackToPlayground?: boolean
 
-  /*
+  /**
    * Per default headers are filtered to forward only a fixed list.
    *
    * If you need to forward additional headers you can use this setting to define them.
