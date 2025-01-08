@@ -80,8 +80,14 @@ export function createApiHandler(options: CreateApiHandlerOptions) {
     requestHeaders.set("Ory-No-Custom-Domain-Redirect", "true")
 
     // Only effective in CI.
-    if (process.env.ORY_NETWORK_STAGING_RATE_LIMIT_HEADER && process.env.ORY_NETWORK_STAGING_RATE_LIMIT_KEY) {
-      requestHeaders.set(process.env.ORY_NETWORK_STAGING_RATE_LIMIT_HEADER, process.env.ORY_NETWORK_STAGING_RATE_LIMIT_KEY)
+    if (
+      process.env.ORY_NETWORK_STAGING_RATE_LIMIT_HEADER &&
+      process.env.ORY_NETWORK_STAGING_RATE_LIMIT_KEY
+    ) {
+      requestHeaders.set(
+        process.env.ORY_NETWORK_STAGING_RATE_LIMIT_HEADER,
+        process.env.ORY_NETWORK_STAGING_RATE_LIMIT_KEY,
+      )
     }
 
     try {
