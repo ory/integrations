@@ -115,6 +115,10 @@ export function createApiHandler(options: CreateApiHandlerOptions) {
     headers.set("Ory-Base-URL-Rewrite", "false")
     headers.set("Ory-No-Custom-Domain-Redirect", "true")
 
+    for (const [key, value] of options.additionalHeaders) {
+      headers.set(key, value)
+    }
+
     const response = await fetch(url, {
       method: req.method,
       headers,
