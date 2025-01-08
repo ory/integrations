@@ -81,12 +81,12 @@ export function createApiHandler(options: CreateApiHandlerOptions) {
 
     // Only effective in CI.
     if (
-      process.env.ORY_NETWORK_STAGING_RATE_LIMIT_HEADER &&
-      process.env.ORY_NETWORK_STAGING_RATE_LIMIT_KEY
+      process.env.ORY_CI_RATE_LIMIT_HEADER &&
+      process.env.ORY_CI_RATE_LIMIT_HEADER_VALUE
     ) {
       requestHeaders.set(
-        process.env.ORY_NETWORK_STAGING_RATE_LIMIT_HEADER,
-        process.env.ORY_NETWORK_STAGING_RATE_LIMIT_KEY,
+        process.env.ORY_CI_RATE_LIMIT_HEADER,
+        process.env.ORY_CI_RATE_LIMIT_HEADER_VALUE,
       )
     }
 
