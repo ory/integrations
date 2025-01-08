@@ -45,9 +45,4 @@ export interface CreateApiHandlerOptions {
    * If you need to forward additional headers you can use this setting to define them.
    */
   forwardAdditionalHeaders?: string[]
-
-  /**
-   * Define additional headers to pass to the API.
-   */
-  additionalHeaders?: Headers
 }
