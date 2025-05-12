@@ -1,6 +1,12 @@
-# Integrations with Ory
+# NextJS with Ory
 
-This repository contains integrations for connecting with Ory Cloud.
+
+> [!CAUTION]
+> This repository is deprecated and in read-only mode. Please use
+> [`@ory/nextjs`](https://github.com/ory/elements/tree/main/packages/nextjs)
+> instead.
+
+This repository contains integrations for connecting with Ory Network.
 
 ## Table of Contents
 
